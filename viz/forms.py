@@ -13,6 +13,8 @@ GENES = ['ACTA2', 'ADAMTS1', 'ATP6AP1', 'B2M', 'BGN', 'BHLHE40',
          'SPARC', 'TGFB1', 'TGFBR1', 'TGFBR2', 'THBS1', 'THBS2',
          'TIMP1', 'TIMP3', 'TP53BP1', 'VCAN', 'VEGFA', 'VIM']
 
+GENES = [(i.lower(), i) for i in GENES]
+
 TIMEPOINTS = [0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
 
 REPLICATES = range(1, 7)
@@ -26,23 +28,38 @@ class NewForm(forms.Form):
 
 
 
+#
+# class DctModelForm(forms.ModelForm):
+#
+#     class Meta:
+#         model = Dct
+#         fields = ['time', 'replicate', 'treatment', 'gene', 'cell_line']
+#
+#         widgets = {
+#             'gene': forms.SelectMultiple(choices=enumerate(GENES), attrs={'id': 'gene_selection'}),
+#             'time': forms.CheckboxSelectMultiple(choices=enumerate(TIMEPOINTS), attrs={'id': 'time_selection'}),
+#             'replicate': forms.CheckboxSelectMultiple(choices=enumerate(REPLICATES), attrs={'id': 'replicate_selection'}),
+#             'treatment': forms.CheckboxSelectMultiple(choices=enumerate(TREATMENTS), attrs={'id': 'treatments_selection'}),
+#             'cell_line': forms.CheckboxSelectMultiple(choices=enumerate(CELL_LINES), attrs={'id': 'cell_lines_selection'})
+#         }
 
-class DctModelForm(forms.ModelForm):
 
-    class Meta:
-        model = Dct
-        fields = ['time', 'replicate', 'treatment', 'gene', 'cell_line']
+class GenesForm(forms.Form):
+    gene = forms.MultipleChoiceField(
+        choices=GENES,
+    )#, attrs={'id': 'gene_form'})
 
-        widgets = {
-            'gene': forms.SelectMultiple(choices=enumerate(GENES), attrs={'id': 'gene_selection'}),
-            'time': forms.CheckboxSelectMultiple(choices=enumerate(TIMEPOINTS), attrs={'id': 'time_selection'}),
-            'replicate': forms.CheckboxSelectMultiple(choices=enumerate(REPLICATES), attrs={'id': 'replicate_selection'}),
-            'treatment': forms.CheckboxSelectMultiple(choices=enumerate(TREATMENTS), attrs={'id': 'treatments_selection'}),
-            'cell_line': forms.CheckboxSelectMultiple(choices=enumerate(CELL_LINES), attrs={'id': 'cell_lines_selection'})
-        }
+    gene.widget.attrs.update({
+        'font-size': '3em'
+    })
 
-
-
+    # class Meta:
+    #     model = Dct
+    #     fields = ['time', 'replicate', 'treatment', 'gene', 'cell_line']
+    #
+    #     widgets = {
+    #         'gene': forms.SelectMultiple(choices=enumerate(GENES), attrs={'id': 'gene_selection'}),
+    #     }
 
 
 

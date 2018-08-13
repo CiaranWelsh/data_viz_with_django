@@ -1,0 +1,76 @@
+
+
+html, body {
+    background-color: black;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, p, label {
+    color: white;
+    text-align: center;
+}
+
+
+option {
+    color: white;
+}
+
+select {
+    background-color: #505255;
+
+}
+form {
+    size: 50px;
+}
+
+#container {
+    height: 100%;
+}
+
+#row1 {
+    height: 100%;
+}
+
+#inner-row1 {
+    background-color: aqua;
+    height: 75%;
+}
+
+#inner-row2 {
+    background-color: cornsilk;
+    height: 25%;
+}
+
+#navbar {
+    background-color: green;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

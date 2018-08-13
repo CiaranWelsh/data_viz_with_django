@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm
 
 from .models import Dct
-from .forms import NewForm, DctModelForm
+from .forms import NewForm, GenesForm
 # Create your views here.
 
 
@@ -49,9 +49,11 @@ def control_panel(request):
     #         return HttpResponseRedirect('thanks')
     #
     # else:
-    form = DctModelForm()
+    #     form = DctModelForm()
 
-    return render(request, 'viz/index.html', {'form': form})
+    gene_form = GenesForm()
+
+    return render(request, 'viz/index.html', {'gene_form': gene_form})
 
 
 
