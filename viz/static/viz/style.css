@@ -7,19 +7,16 @@ html, body {
     flex-direction: column;
 }
 
-h1, h2, h3, p, label {
+h1, h2, h3, p, label, option {
     color: white;
     text-align: center;
 }
 
 
-option {
-    color: white;
-}
-
 select {
     background-color: #505255;
-
+    width: 95%;
+    height: 75%;
 }
 form {
     size: 50px;
@@ -34,24 +31,26 @@ form {
 }
 
 #inner-row1 {
-    background-color: aqua;
     height: 75%;
 }
 
 #inner-row2 {
-    background-color: cornsilk;
     height: 25%;
 }
 
 #navbar {
-    background-color: green;
 }
 
 
+#gene-selection {
+    background-color: #505255;
+    height: 100%;
+}
 
-
-
-
+.my-btn {
+    width: 25px;
+    height:13px;
+}
 
 
 

@@ -47,10 +47,11 @@ class NewForm(forms.Form):
 class GenesForm(forms.Form):
     gene = forms.MultipleChoiceField(
         choices=GENES,
+        label=False
     )#, attrs={'id': 'gene_form'})
 
     gene.widget.attrs.update({
-        'font-size': '3em'
+        'size': 15,
     })
 
     # class Meta:
