@@ -16,7 +16,7 @@ h1, h2, h3, p, label, option {
 select {
     background-color: #505255;
     width: 95%;
-    height: 75%;
+    height: 100%;
 }
 form {
     size: 50px;
@@ -47,18 +47,28 @@ form {
     height: 100%;
 }
 
-.my-btn {
-    width: 25px;
-    height:13px;
+option {
+    font-size: 24px;
+}
+
+.option-cls {
+
+}
+
+.top-to-bottom{
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    right: 0;
+
 }
 
 
-
-
-
-
-
-
+svg {
+    background-color: white;
+    height: 100%;
+    width: 100%;
+}
 
 
 

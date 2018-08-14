@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 {% load static %}
+{# Load the tag library #}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>viz index</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    {#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">#}
+    {#    <script src="https://code.jquery.com/jquery-3.3.1.min.js"#}
+    {#            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>#}
     <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
 </head>
 <body>
@@ -44,63 +53,41 @@
         </div>
         <div class="container-fluid col">
             <div class="row" id="inner-row1">
-                <div class="col-md-12">
+                <div class="col">
                     <svg>
 
                     </svg>
                 </div>
             </div>
-            <div class="row" id="gene-selection">
-                <div class="col-md-12 searchable-container">
-                    <h2>Genes Selection</h2>
-                    <div class="form-group">
-                        <div>
-                            <input type="search" class="form-control" id="gene-search" placeholder="Search for gene">
-                        </div>
-                    </div>
-                    <div class="row">
-                        {{ gene_form }}
-{#                        <div class="form-group">#}
-{#                            <div class="searchable-container">#}
-{#                                <div class="items my-btn">#}
-{#                                    <div class="info-block block-info clearfix">#}
-{#                                        <div data-toggle="buttons" class="btn-group bizmoduleselect"></div>#}
-{#                                        <label class="btn btn-default">#}
-{#                                            <div class="bizcontent">#}
-{#                                                <input type="checkbox">#}
-{#                                                <span class="glyphicon glyphicon-ok glyphicon-lg"></span>#}
-{#                                            </div>#}
-{#                                        </label>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-                    </div>
-                </div>
+            <div class="row" id="">
             </div>
 
 
         </div>
         {#        Control panel stuff#}
-        <div class="col-md-3">
-            <div id="time">
-
+        <div class="col-2">
+            <div class="top-to-bottom">
+                <div class="form">
+                    <h2>Genes Selection</h2>
+                    <div class="row">
+                        {{ gene_form }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-{#<div class="container-fluid">#}
-{#    <div class="row">#}
-{#        <div class="colSM">#}
-{#            <form action="/do-something/" method="post">#}
-{#                {% csrf_token %}#}
-{#                {{ gene_form }}#}
-{#                <input type="submit" value="Submit">#}
-{#            </form>#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
+    {#<div class="container-fluid">#}
+    {#    <div class="row">#}
+    {#        <div class="colSM">#}
+    {#            <form action="/do-something/" method="post">#}
+    {#                {% csrf_token %}#}
+    {#                {{ gene_form }}#}
+    {#                <input type="submit" value="Submit">#}
+    {#            </form>#}
+    {#        </div>#}
+    {#    </div>#}
+    {#</div>#}
 </body>
 </html>
 

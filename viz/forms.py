@@ -51,7 +51,7 @@ class GenesForm(forms.Form):
     )#, attrs={'id': 'gene_form'})
 
     gene.widget.attrs.update({
-        'size': 15,
+        'size': 50,
     })
 
     # class Meta:
