@@ -1,61 +1,44 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.forms import ModelForm
+import pandas
 
 from .models import Dct
-from .forms import NewForm, GenesForm
-# Create your views here.
+from .forms import DBControllerForm
+from django_pandas.io import read_frame
 
+def db_controller_view(request):
 
+    if request.method == 'POST':
 
+        cell_lines = request.POST.getlist('cell_lines')
+        genes = request.POST.getlist('genes')
+        treatments = request.POST.getlist('treatments')
+        time_points = request.POST.getlist('time_points')
+        data = Dct.objects.filter(
+            cell_line__in=cell_lines
+        ).filter(
+            gene__in=genes
+        ).filter(
+            treatment__in=treatments
+        ).filter(
+            time__in=time_points
+        )
+        # df_list = [pandas.DataFrame(i, index=[0]) for i in data]
+        # df = pandas.concat(df_list)
+        df = read_frame(data)
+        json = df.to_json(orient='records')
+        context = {
+            'data': json,
+            'columns': df.columns
+        }
+        return HttpResponse(df.to_html())
+        # return render(request, 'index.html', context)
 
+    else:
 
+        db_controller_form = DBControllerForm()
 
-
-def sql_builder(request, **kwargs):
-    sql = "SELECT * from dct WHERE cell_type='A'"
-
-
-
-def get_all(request, **kwargs):
-    # dct = get_object_or_404(Dct)
-    objs = Dct.objects.all()
-    return HttpResponse('get_all return value')
-
-
-
-
-
-# def get_name(request):
-#     if request.method == 'POST':
-#         form = NewForm(request.POST)
-#         if form.is_valid():
-#             return HttpResponseRedirect('thanks')
-#
-#     else:
-#         form = NewForm()
-#
-#     return render(request, 'viz/index.html', {'form': form})
-
-
-
-
-
-
-def control_panel(request):
-    # if request.method == 'POST':
-    #     form = DctModelForm(request.POST)
-    #     if form.is_valid():
-    #         return HttpResponseRedirect('thanks')
-    #
-    # else:
-    #     form = DctModelForm()
-
-    gene_form = GenesForm()
-
-    return render(request, 'viz/index.html', {'gene_form': gene_form})
-
-
-
-
-
+        return render(request, 'viz/index.html', {
+            'db_controller_form': db_controller_form
+        })

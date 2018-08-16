@@ -20,5 +20,5 @@ from viz import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.get_name, {}, name='index'),
-    path('', views.control_panel, {}, name='control_panel')
+    path('', views.db_controller_view, {}, name='db_controller')
 ]
