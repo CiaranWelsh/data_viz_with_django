@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'viz',
-    'viz2',
     'bootstrap4',
     'django_nvd3',
     'django.contrib.admin',

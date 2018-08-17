@@ -5,6 +5,7 @@ body, html {
     display: flex;
     flex-direction: column;
     width: 100%;
+
 }
 
 h1, h2, h3, p, label, option {
@@ -26,14 +27,35 @@ ul {
     width: 100%;
 }
 
-select {
-    background-color: #505255;
-    width: 30%;
-    height: 30%;
-}
-
 option {
     background-color: #505255;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+/*table {*/
+    /*margin: 0 auto 0 auto;*/
+/*}*/
+
+
+div>form th{
+    display: block;
+    text-align: right;
+}
+
+div>form td{
+    text-align: center;
+}
+
+form {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    font-size: 1.25em;
 }
 
 #container {
@@ -45,40 +67,36 @@ option {
 }
 
 #svg-container {
-    height: 66%;
+    height: 60%;
     background-color: white;
     width: 100%;
 }
 
 #outside-opt-container {
-    height: 30%;
+    height: 40%;
     background-color: #505255;
 }
 
-svg {
+#submit-btn {
+    position: relative;
+    top: 25px;
+    left: 50%;
+}
+
+#ctrl-panel-tbl {
     width: 100%;
     height: 100%;
 }
 
-#right, #id_genes {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    top: 0;
-    width: 100%;
+#ctrl-panel-form {
+    width: 80%;
     height: 100%;
+    padding-left: 20%;
 }
-
-#id_genes {
-    margin: 0 0 -50px 0;
-}
-
-
 
 #h2_control_panel {
     background-color: #383a3d;
 }
-
 
 .checkbox{
     width: 23px;
@@ -92,9 +110,11 @@ svg {
 }
 
 
-
-
-
+#submit-btn {
+    position: relative;
+    /*bottom: 25px;*/
+    /*margin-bottom: 50px;*/
+}
 
 
 

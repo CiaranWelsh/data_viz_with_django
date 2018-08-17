@@ -3,6 +3,8 @@
 {# Load the tag library #}
 {% load bootstrap4 %}
 
+{% load nvd3_tags %}
+
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript jquery='full' %}
@@ -14,9 +16,6 @@
     <meta charset="UTF-8">
     <title>viz index</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">#}
-    {#    <script src="https://code.jquery.com/jquery-3.3.1.min.js"#}
-    {#            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>#}
     <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
     <script>
         $(".checkbox").click(function () {
@@ -29,16 +28,19 @@
 <div class="container-fluid" id="container">
     <div class="row" id="row1">
         {#        Code for creating a navbar, left of page#}
-        <div class="col-md-1 navbar" id="panel-left">
+        <div class="col-md-2 navbar" id="panel-left">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 1</a>
+                    <a class="nav-link" href="#">Bar Graph</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 2</a>
+                    <a class="nav-link" href="#">Line Graph</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 3</a>
+                    <a class="nav-link" href="#">Data Table</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Design</a>
                 </li>
             </ul>
         </div>
@@ -48,59 +50,62 @@
 
             {#            svg stuff where graphs will be rendered#}
             <div class="" id="svg-container">
-                <canvas id="canvas">
-                    {% block content %}
+                {% block content %}
 
-                    {% endblock %}
-
-                </canvas>
-
+                {% endblock %}
             </div>
 
             {#            Another control panel for selecting options#}
             <div class="" id="outside-opt-container">
                 {#                <div class="col" id="inside-opt-container">#}
                 <h2 id="h2_control_panel">Control Panel</h2>
-                <div class="">
-                    <table border="2">
-                        <form action="." name="control_panel" method="post" class="form-check-inline">
+                <div id="div-form">
+                    {#                    {% block form %}#}
+                    <form action="data_table.html" id="ctrl-panel-form" name="control_panel" method="post"
+                          class="form-check-inline">
+                        <table border="2" class="table-dark center" id="ctrl-panel-tbl">
                             {% csrf_token %}
-                            {% for field in db_controller_form %}
-                                {% if field.auto_id not in "['id_genes', 'id_I']" %}
-                                    <div class="form-check">
-                                        {% for box in field %}
-{#                                            <label for="{{ box.id_for_label }}">#}
-{#                                                <input type="checkbox" name="{{ box.name }}" value="{{ box.choice_label }}" id="{{ box.id_for_label }}">#}
-{#                                            </label>#}
-                                            {{ box }}
-                                            {#                                        <input class="form-check-input" type="checkbox" name="{{ box.id_for_label }}">#}
-                                            {#                                        <label></label>#}
-                                        {% endfor %}
-                                        <br>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                            <div>
-                                <input type="submit" value="Submit">
-                            </div>
-                        </form>
-                    </table>
+                            {{ db_controller_form }}
+                        </table>
+                    </form>
+                    {#                    {% endblock %}#}
                 </div>
+                <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
             </div>
         </div>
 
         {#        Control panel stuff, right of page#}
-        <div class="col-2 panel-right">
-            <div class="top-to-bottom">
-                <div class="row" , id="right">
-                    {{ db_controller_form.genes }}
-                </div>
-            </div>
-        </div>
+        {#        <div class="col-2 panel-right">#}
+        {#            <div class="top-to-bottom">#}
+        {#                <div class="row" , id="right">#}
+        {#                    {{ db_controller_form.genes }}#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
     </div>
 </div>
 <script>
+    // dynamically center control panel table
+    var div_width = $("#div-form").outerWidth(includeMargin = true);
+    var tbl_width = $("#ctrl-panel-tbl").outerWidth(includeMargin = true);
+    var div_height = $("#div-form").outerHeight(includeMargin = true);
+    var tbl_height = $("#ctrl-panel-tbl").outerHeight(includeMargin = true);
 
+    var spacing_width = (div_width - tbl_width) / 2;
+    var spacing_height = (div_height - tbl_height) / 2;
+
+    $("#ctrl-panel-form")
+        .css("padding-left", spacing_width.toString() + "px")
+        .css("padding-top", spacing_height.toString() + "px");
+
+    // Set some defaults to the control panel boxes.
+    document.getElementById("id_cell_lines_0").checked = true;
+    document.getElementById("id_treatments_0").checked = true;
+    document.getElementById("id_treatments_1").checked = true;
+    $("#id_time_points * input").each(function () {
+        console.log($(this))
+        $(this).prop('checked', true);
+    });
 </script>
 </body>
 </html>
