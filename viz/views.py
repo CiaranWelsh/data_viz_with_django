@@ -9,7 +9,7 @@ from .forms import DBControllerForm
 from django_pandas.io import read_frame
 
 from bokeh.plotting import figure
-from bokeh.models import Legend
+from bokeh.models import Legend, Whisker, ColumnDataSource
 from bokeh.embed import components
 import bokeh.palettes as palettes
 from itertools import cycle
@@ -33,7 +33,7 @@ def plot_view(request):
             time__in=time_points
         )
 
-        sems = Mean.objects.filter(
+        sems = Sem.objects.filter(
             cell_line__in=cell_lines
         ).filter(
             gene__in=genes
@@ -43,7 +43,7 @@ def plot_view(request):
             time__in=time_points
         )
 
-        stds = Mean.objects.filter(
+        stds = Std.objects.filter(
             cell_line__in=cell_lines
         ).filter(
             gene__in=genes
@@ -73,10 +73,6 @@ def plot_view(request):
             columns='time',
         )
 
-        # print(means)
-        # print(means.shape)
-
-
         TOOLS = "pan,wheel_zoom,box_zoom,reset,save,box_select"
 
         plot = figure(
@@ -95,7 +91,6 @@ def plot_view(request):
         plot.xgrid.visible = False
         plot.ygrid.visible = False
 
-
         num_colours_needed = 0
         for cl in sorted(list(set(means.index.get_level_values(0)))):
             for tr in sorted(list(set(means.index.get_level_values(1)))):
@@ -113,18 +108,31 @@ def plot_view(request):
 
         cols = colour_gen()
         legend_items = []
+        err_data = {}
         for cl in sorted(list(set(means.index.get_level_values(0)))):
             for tr in sorted(list(set(means.index.get_level_values(1)))):
                 for g in sorted(list(set(means.index.get_level_values(2)))):
+
                     col = cols.__next__()
                     plot_data = means.loc[cl, tr, g]
+                    err_data = sems.loc[cl, tr, g]
+
                     legend_label = '{}_{}_{}'.format(g, cl, tr),
+
+                    err_xs = []
+                    err_ys = []
+
+                    for x, y, err in zip(list(plot_data.index), plot_data.values, err_data.values):
+                        err_xs.append((x, x))
+                        err_ys.append((y - err, y + err))
+
                     lin = plot.line(
                         list(plot_data.index),
                         plot_data.values,
                         color=col,
                         line_width=5,
                         legend=legend_label[0],
+                        alpha=0.75
                     )
 
                     circ = plot.circle(
@@ -132,28 +140,38 @@ def plot_view(request):
                         plot_data.values,
                         color=col,
                         size=15,
-                        legend=legend_label[0]
+                        legend=legend_label[0],
+                        alpha=0.5
                     )
-                    # legend_items.append((legend_label[0], [lin, circ]))
-        #
-        # legend = Legend(items=legend_items, location=(0, 200))
-        # plot.add_layout(legend, 'right')
+
+                    ##plot errors
+                    errs = plot.multi_line(
+                        err_xs, err_ys,
+                        line_width=4,
+                        color=col,
+                        alpha=0.5
+                    )
+
         plot.legend.label_text_font_size = '20pt'
         plot.legend.location = 'top_left'
+
         script, div = components(plot)
 
         context = {
             'means': means,
             'sems': sems,
             'stds': stds,
-            'db_controller_form': DBControllerForm(),
+            'db_controller_form': DBControllerForm(initial={
+                'cell_lines': cell_lines,
+                'treatments': treatments,
+                'genes': genes,
+                'time_points': time_points
+            }),
             'script': script,
             'div': div
         }
-        # return HttpResponse(df.to_html())
 
         return render(request, 'viz/index.html', context=context)
-        # return render(request, '.', context)
 
     else:
 
