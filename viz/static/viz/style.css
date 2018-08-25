@@ -1,10 +1,11 @@
 
-
-html, body {
+body, html {
     background-color: black;
     height: 100%;
     display: flex;
     flex-direction: column;
+    width: 100%;
+
 }
 
 h1, h2, h3, p, label, option {
@@ -12,14 +13,48 @@ h1, h2, h3, p, label, option {
     text-align: center;
 }
 
+canvas {
+    height: 100px;
+    width: 100px;
+    background-color: cornsilk;
+}
 
-select {
+li {
+    display: inline-block;
+}
+
+ul {
+    width: 100%;
+}
+
+option {
     background-color: #505255;
-    width: 95%;
+}
+
+svg {
+    width: 100%;
     height: 100%;
 }
+
+/*table {*/
+/*margin: 0 auto 0 auto;*/
+/*}*/
+
+div > form th {
+    display: block;
+    text-align: right;
+}
+
+div > form td {
+    text-align: center;
+}
+
 form {
-    size: 50px;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    font-size: 1.25em;
 }
 
 #container {
@@ -30,56 +65,56 @@ form {
     height: 100%;
 }
 
-#inner-row1 {
-    height: 75%;
-}
-
-#inner-row2 {
-    height: 25%;
-}
-
-#navbar {
-}
-
-
-#gene-selection {
+#outside-opt-container {
+    height: 40%;
     background-color: #505255;
-    height: 100%;
 }
 
-option {
-    font-size: 24px;
+#submit-btn {
+    position: relative;
+    top: 25px;
+    left: 50%;
 }
 
-.option-cls {
-
-}
-
-.top-to-bottom{
-    position: absolute;
-    bottom: 0;
-    top: 0;
-    right: 0;
-
-}
-
-
-svg {
-    background-color: white;
-    height: 100%;
+#ctrl-panel-tbl {
     width: 100%;
+    height: 100%;
 }
 
+#ctrl-panel-form {
+    width: 80%;
+    height: 100%;
+    padding-left: 20%;
+}
 
+#h2_control_panel {
+    background-color: #383a3d;
+}
 
+.checkbox {
+    width: 23px;
+    height: 21px;
+    background: transparent url(http://i.stack.imgur.com/S4p2R.png) no-repeat 0 50%;
 
+    display: inline-block;
+}
 
+.checked {
+    background: transparent url(http://i.stack.imgur.com/S4p2R.png) no-repeat 80% 50%
+}
 
+#submit-btn {
+    position: relative;
+    /*bottom: 25px;*/
+    /*margin-bottom: 50px;*/
+}
 
-
-
-
-
-
+#viz-box {
+    height: 60%;
+    background-color: white;
+    width: 100%;
+    overflow: scroll;
+    padding: 25px;
+}
 
 

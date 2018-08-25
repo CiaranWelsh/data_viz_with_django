@@ -1,4 +1,7 @@
 from django import forms
+from django.utils.encoding import force_text
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from .models import Dct
 
 GENES = ['ACTA2', 'ADAMTS1', 'ATP6AP1', 'B2M', 'BGN', 'BHLHE40',
@@ -13,64 +16,52 @@ GENES = ['ACTA2', 'ADAMTS1', 'ATP6AP1', 'B2M', 'BGN', 'BHLHE40',
          'SPARC', 'TGFB1', 'TGFBR1', 'TGFBR2', 'THBS1', 'THBS2',
          'TIMP1', 'TIMP3', 'TP53BP1', 'VCAN', 'VEGFA', 'VIM']
 
-GENES = [(i.lower(), i) for i in GENES]
+GENES = [(i, i) for i in GENES]
 
 TIMEPOINTS = [0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
+TIMEPOINTS = [(i, i) for i in TIMEPOINTS]
 
-REPLICATES = range(1, 7)
+# REPLICATES = range(1, 7)
+
 
 TREATMENTS = ['TGFb', 'Control']
+TREATMENTS = [(i, i) for i in TREATMENTS]
 
 CELL_LINES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-
-class NewForm(forms.Form):
-    name = forms.CharField(label='your name', max_length=100)
+CELL_LINES = [(i, i) for i in CELL_LINES]
 
 
-
-#
-# class DctModelForm(forms.ModelForm):
-#
-#     class Meta:
-#         model = Dct
-#         fields = ['time', 'replicate', 'treatment', 'gene', 'cell_line']
-#
-#         widgets = {
-#             'gene': forms.SelectMultiple(choices=enumerate(GENES), attrs={'id': 'gene_selection'}),
-#             'time': forms.CheckboxSelectMultiple(choices=enumerate(TIMEPOINTS), attrs={'id': 'time_selection'}),
-#             'replicate': forms.CheckboxSelectMultiple(choices=enumerate(REPLICATES), attrs={'id': 'replicate_selection'}),
-#             'treatment': forms.CheckboxSelectMultiple(choices=enumerate(TREATMENTS), attrs={'id': 'treatments_selection'}),
-#             'cell_line': forms.CheckboxSelectMultiple(choices=enumerate(CELL_LINES), attrs={'id': 'cell_lines_selection'})
-#         }
-
-
-class GenesForm(forms.Form):
-    gene = forms.MultipleChoiceField(
+class DBControllerForm(forms.Form):
+    genes = forms.ChoiceField(
         choices=GENES,
-        label=False
-    )#, attrs={'id': 'gene_form'})
+        initial='ACTA2'
+    )
+    # genes.widget.attrs.update({
+    #     'size': 27,
+    # })
 
-    gene.widget.attrs.update({
-        'size': 50,
-    })
+    cell_lines = forms.MultipleChoiceField(
+        choices=CELL_LINES,
+        widget=forms.CheckboxSelectMultiple,
+        initial=['A']
+    )
 
-    # class Meta:
-    #     model = Dct
-    #     fields = ['time', 'replicate', 'treatment', 'gene', 'cell_line']
-    #
-    #     widgets = {
-    #         'gene': forms.SelectMultiple(choices=enumerate(GENES), attrs={'id': 'gene_selection'}),
-    #     }
+    treatments = forms.MultipleChoiceField(
+        choices=TREATMENTS,
+        widget=forms.CheckboxSelectMultiple,
+        initial=['TGFb', 'Control']
+    )
 
-
-
-
-
-
-
-
-
-
+    time_points = forms.MultipleChoiceField(
+        choices=TIMEPOINTS,
+        widget=forms.CheckboxSelectMultiple,
+        initial=[0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
+    )
+    # for i in [cell_lines, time_points, treatments]:
+    #     i.widget.attrs.update({
+    #         # 'class': 'form-check-input',
+    #         'checked': 'checked'
+    #     })
 
 
 

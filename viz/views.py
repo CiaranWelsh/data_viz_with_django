@@ -1,61 +1,219 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
 from django.forms import ModelForm
+import pandas
 
-from .models import Dct
-from .forms import NewForm, GenesForm
-# Create your views here.
+from .models import Dct, Mean, Sem, Std
+from .forms import DBControllerForm
+from django_pandas.io import read_frame
 
-
-
-
-
-
-
-def sql_builder(request, **kwargs):
-    sql = "SELECT * from dct WHERE cell_type='A'"
+from bokeh.plotting import figure
+from bokeh.models import Legend
+from bokeh.embed import components
+import bokeh.palettes as palettes
+from itertools import cycle
 
 
+def plot_view(request):
+    if request.method == 'POST':
 
-def get_all(request, **kwargs):
-    # dct = get_object_or_404(Dct)
-    objs = Dct.objects.all()
-    return HttpResponse('get_all return value')
+        cell_lines = request.POST.getlist('cell_lines')
+        genes = request.POST.getlist('genes')
+        treatments = request.POST.getlist('treatments')
+        time_points = request.POST.getlist('time_points')
+
+        means = Mean.objects.filter(
+            cell_line__in=cell_lines
+        ).filter(
+            gene__in=genes
+        ).filter(
+            treatment__in=treatments
+        ).filter(
+            time__in=time_points
+        )
+
+        sems = Mean.objects.filter(
+            cell_line__in=cell_lines
+        ).filter(
+            gene__in=genes
+        ).filter(
+            treatment__in=treatments
+        ).filter(
+            time__in=time_points
+        )
+
+        stds = Mean.objects.filter(
+            cell_line__in=cell_lines
+        ).filter(
+            gene__in=genes
+        ).filter(
+            treatment__in=treatments
+        ).filter(
+            time__in=time_points
+        )
+
+        means = read_frame(means, index_col='index')
+        sems = read_frame(sems, index_col='index')
+        stds = read_frame(stds, index_col='index')
+
+        means = means.pivot_table(
+            values='value',
+            index=['cell_line', 'treatment', 'gene'],
+            columns='time',
+        )
+        sems = sems.pivot_table(
+            values='value',
+            index=['cell_line', 'treatment', 'gene'],
+            columns='time',
+        )
+        stds = stds.pivot_table(
+            values='value',
+            index=['cell_line', 'treatment', 'gene'],
+            columns='time',
+        )
+
+        # print(means)
+        # print(means.shape)
 
 
+        TOOLS = "pan,wheel_zoom,box_zoom,reset,save,box_select"
+
+        plot = figure(
+            sizing_mode='stretch_both',
+            x_axis_label='Time (h)',
+            y_axis_label='Normalised Cycle Threshold',
+            tools=TOOLS,
+            toolbar_location='above'
+        )
+        plot.xaxis.axis_label_text_font_size = '20pt'
+        plot.yaxis.axis_label_text_font_size = '20pt'
+
+        plot.xaxis.major_label_text_font_size = '18pt'
+        plot.yaxis.major_label_text_font_size = '18pt'
+
+        plot.xgrid.visible = False
+        plot.ygrid.visible = False
 
 
+        num_colours_needed = 0
+        for cl in sorted(list(set(means.index.get_level_values(0)))):
+            for tr in sorted(list(set(means.index.get_level_values(1)))):
+                for g in sorted(list(set(means.index.get_level_values(2)))):
+                    num_colours_needed += 1
 
-# def get_name(request):
+        if num_colours_needed <= 2:
+            colours = palettes.Plasma[3]
+        else:
+            colours = palettes.Plasma[num_colours_needed]
+
+        def colour_gen():
+            for c in cycle(colours):
+                yield c
+
+        cols = colour_gen()
+        legend_items = []
+        for cl in sorted(list(set(means.index.get_level_values(0)))):
+            for tr in sorted(list(set(means.index.get_level_values(1)))):
+                for g in sorted(list(set(means.index.get_level_values(2)))):
+                    col = cols.__next__()
+                    plot_data = means.loc[cl, tr, g]
+                    legend_label = '{}_{}_{}'.format(g, cl, tr),
+                    lin = plot.line(
+                        list(plot_data.index),
+                        plot_data.values,
+                        color=col,
+                        line_width=5,
+                        legend=legend_label[0],
+                    )
+
+                    circ = plot.circle(
+                        list(plot_data.index),
+                        plot_data.values,
+                        color=col,
+                        size=15,
+                        legend=legend_label[0]
+                    )
+                    # legend_items.append((legend_label[0], [lin, circ]))
+        #
+        # legend = Legend(items=legend_items, location=(0, 200))
+        # plot.add_layout(legend, 'right')
+        plot.legend.label_text_font_size = '20pt'
+        plot.legend.location = 'top_left'
+        script, div = components(plot)
+
+        context = {
+            'means': means,
+            'sems': sems,
+            'stds': stds,
+            'db_controller_form': DBControllerForm(),
+            'script': script,
+            'div': div
+        }
+        # return HttpResponse(df.to_html())
+
+        return render(request, 'viz/index.html', context=context)
+        # return render(request, '.', context)
+
+    else:
+
+        db_controller_form = DBControllerForm()
+
+        return render(request, 'viz/index.html', {
+            'db_controller_form': db_controller_form
+        })
+
+#
+# def plot_view(request):
 #     if request.method == 'POST':
-#         form = NewForm(request.POST)
-#         if form.is_valid():
-#             return HttpResponseRedirect('thanks')
+#
+#         cell_lines = request.POST.getlist('cell_lines')
+#         genes = request.POST.getlist('genes')
+#         treatments = request.POST.getlist('treatments')
+#         time_points = request.POST.getlist('time_points')
+#         data = Dct.objects.filter(
+#             cell_line__in=cell_lines
+#         ).filter(
+#             gene__in=genes
+#         ).filter(
+#             treatment__in=treatments
+#         ).filter(
+#             time__in=time_points
+#         )
+#         df = read_frame(data)
+#         json = df.to_json(orient='records')
+#
+#         x = [1, 3, 5, 7, 9, 11, 13]
+#         y = [1, 2, 3, 4, 5, 6, 7]
+#         title = 'y = f(x)'
+#
+#         plot = figure(title=title,
+#                       x_axis_label='X-Axis',
+#                       y_axis_label='Y-Axis',
+#                       plot_width=400,
+#                       plot_height=400)
+#
+#         plot.line(x, y, legend='f(x)', line_width=2)
+#         # Store components
+#         script, div = components(plot)
+#
+#         db_controller_form = DBControllerForm()
+#
+#         context = {
+#             'data': df.to_html(),
+#             'json': json,
+#             'columns': df.columns,
+#             'db_controller_form': db_controller_form,
+#             'script': script,
+#             'div': div,
+#         }
+#         return render(request, 'viz/index.html', context=context)
+#         # return render(request, '.', context)
 #
 #     else:
-#         form = NewForm()
 #
-#     return render(request, 'viz/index.html', {'form': form})
-
-
-
-
-
-
-def control_panel(request):
-    # if request.method == 'POST':
-    #     form = DctModelForm(request.POST)
-    #     if form.is_valid():
-    #         return HttpResponseRedirect('thanks')
-    #
-    # else:
-    #     form = DctModelForm()
-
-    gene_form = GenesForm()
-
-    return render(request, 'viz/index.html', {'gene_form': gene_form})
-
-
-
-
-
+#         db_controller_form = DBControllerForm()
+#
+#         return render(request, 'viz/index.html', {
+#             'db_controller_form': db_controller_form
+#         })

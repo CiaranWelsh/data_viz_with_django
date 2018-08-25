@@ -139,3 +139,42 @@ class DjangoSession(models.Model):
     class Meta:
         managed = False
         db_table = 'django_session'
+
+
+class Mean(models.Model):
+    index = models.IntegerField(blank=True, primary_key=True)
+    cell_line = models.TextField(blank=True, null=True)
+    gene = models.TextField(blank=True, null=True)
+    treatment = models.TextField(blank=True, null=True)
+    time = models.FloatField(blank=True, null=True)
+    value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'mean'
+
+
+class Sem(models.Model):
+    index = models.IntegerField(blank=True, primary_key=True)
+    cell_line = models.TextField(blank=True, null=True)
+    gene = models.TextField(blank=True, null=True)
+    treatment = models.TextField(blank=True, null=True)
+    time = models.FloatField(blank=True, null=True)
+    value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'sem'
+
+
+class Std(models.Model):
+    index = models.IntegerField(blank=True, primary_key=True)
+    cell_line = models.TextField(blank=True, null=True)
+    gene = models.TextField(blank=True, null=True)
+    treatment = models.TextField(blank=True, null=True)
+    time = models.FloatField(blank=True, null=True)
+    value = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'std'

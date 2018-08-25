@@ -3,6 +3,8 @@
 {# Load the tag library #}
 {% load bootstrap4 %}
 
+{% load nvd3_tags %}
+
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript jquery='full' %}
@@ -14,80 +16,105 @@
     <meta charset="UTF-8">
     <title>viz index</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">#}
-    {#    <script src="https://code.jquery.com/jquery-3.3.1.min.js"#}
-    {#            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>#}
+
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css" rel="stylesheet" type="text/css">
+
     <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
+
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
+    <script>
+        $(".checkbox").click(function () {
+            $(this).toggleClass('checked')
+        });
+    </script>
+
 </head>
 <body>
 
-
-{#<form action="{% url 'viz:get_all' %}" method="get"></form>#}
-{#<form action="/your-name/" method="post">#}
-{#    {% csrf_token %}#}
-{#    {{ form }}#}
-{#    <input type="submit" value="Submit">#}
-{#</form>#}
-
-{#// div that contains the entire page#}
-
-{#    //for control panel#}
-
 <div class="container-fluid" id="container">
-    <h1> viz index </h1>
     <div class="row" id="row1">
-
-        {#        Code for creating a navbar#}
-        <div class="col-md-1 navbar" id="navbar">
+        {#        Code for creating a navbar, left of page#}
+        <div class="col-md-2 navbar" id="panel-left">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 1</a>
+                    <a class="nav-link" href=".">HOME</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 2</a>
+                    <a class="nav-link" href="#">Bar Graph</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link 3</a>
+                    <a class="nav-link" href="#">Line Graph</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Data Table</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Design</a>
                 </li>
             </ul>
         </div>
+        {#        Content, middle of page, wide col#}
         <div class="container-fluid col">
-            <div class="row" id="inner-row1">
-                <div class="col">
-                    <svg>
+            <h1>Title Here</h1>
 
-                    </svg>
+            <div class="" id="viz-box">
+                {{ div | safe }}
+            </div>
+
+            {#            Another control panel for selecting options#}
+            <div class="" id="outside-opt-container">
+                {#                <div class="col" id="inside-opt-container">#}
+                <h2 id="h2_control_panel">Control Panel</h2>
+                <div id="div-form">
+                    {#                    {% block form %}#}
+                    <form action="."
+                          id="ctrl-panel-form"
+                          name="control_panel"
+                          method="post"
+                          class="form-check-inline">
+                        <table border="2" class="table-dark center" id="ctrl-panel-tbl">
+                            {% csrf_token %}
+                            {#                            {% for field in db_controller_form %}#}
+                            {#                                {{ field.errors }}#}
+                            {#                                {{ field.help_text}}#}
+                            {{ field }}
+                            {#                            {% endfor %}#}
+                            {{ db_controller_form }}
+                        </table>
+                    </form>
+                    {#                    {% endblock %}#}
                 </div>
-            </div>
-            <div class="row" id="">
-            </div>
-
-
-        </div>
-        {#        Control panel stuff#}
-        <div class="col-2">
-            <div class="top-to-bottom">
-                <div class="form">
-                    <h2>Genes Selection</h2>
-                    <div class="row">
-                        {{ gene_form }}
-                    </div>
-                </div>
+                <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
             </div>
         </div>
+
+        {#        Control panel stuff, right of page#}
+        {#        <div class="col-2 panel-right">#}
+        {#            <div class="top-to-bottom">#}
+        {#                <div class="row" , id="right">#}
+        {#                    {{ db_controller_form.genes }}#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
     </div>
+</div>
+{#<script>#}
+{#    // Set some defaults to the control panel boxes.#}
+{#document.getElementById("id_cell_lines_0").checked = true;#}
+{#document.getElementById("id_treatments_0").checked = true;#}
+{#document.getElementById("id_treatments_1").checked = true;#}
+{#$("#id_time_points * input").each(function () {#}
+{#    console.log($(this))#}
+{#    $(this).prop('checked', true);#}
+{#    });#}
+{#</script>#}
+{{ script | safe }}
 
-    {#<div class="container-fluid">#}
-    {#    <div class="row">#}
-    {#        <div class="colSM">#}
-    {#            <form action="/do-something/" method="post">#}
-    {#                {% csrf_token %}#}
-    {#                {{ gene_form }}#}
-    {#                <input type="submit" value="Submit">#}
-    {#            </form>#}
-    {#        </div>#}
-    {#    </div>#}
-    {#</div>#}
 </body>
 </html>
 
