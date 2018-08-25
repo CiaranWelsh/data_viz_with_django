@@ -67,32 +67,42 @@
             </div>
 
             {#            Another control panel for selecting options#}
-            <div class="" id="outside-opt-container">
-                {#                <div class="col" id="inside-opt-container">#}
-                <h2 id="h2_control_panel">Control Panel</h2>
-                <div id="div-form">
-                    {#                    {% block form %}#}
-                    <form action="."
-                          id="ctrl-panel-form"
-                          name="control_panel"
-                          method="post"
-                          class="form-check-inline">
-                        <table border="2" class="table-dark center" id="ctrl-panel-tbl">
-                            {% csrf_token %}
-                            {#                            {% for field in db_controller_form %}#}
-                            {#                                {{ field.errors }}#}
-                            {#                                {{ field.help_text}}#}
-                            {{ field }}
-                            {#                            {% endfor %}#}
-                            {{ db_controller_form }}
-                        </table>
-                    </form>
-                    {#                    {% endblock %}#}
-                </div>
-                <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
+            <div class="tab">
+                <button class="tablinks"
+                        onClick="openTab(event, 'control_panel')"
+                        id="control_panel_tab">Control Panel
+                </button>
+                <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
             </div>
-        </div>
 
+            <div class="" id="outside-opt-container">
+
+                <div class="tabcontent" id="control_panel">
+                    {#                    {% block form %}#}
+                    <div>
+                        <form action="."
+                              id="ctrl-panel-form"
+                              name="control_panel"
+                              method="post"
+                              class="form-check-inline">
+                            <table border="2" class="table-dark center" id="ctrl-panel-tbl">
+                                {% csrf_token %}
+                                {{ field }}
+                                {{ db_controller_form }}
+                            </table>
+                        </form>
+                    </div>
+                    <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
+
+                </div>
+
+
+                <div class="tabcontent" id="legend">
+                    <h2>legend</h2>
+                </div>
+            </div>
+
+        </div>
         {#        Control panel stuff, right of page#}
         {#        <div class="col-2 panel-right">#}
         {#            <div class="top-to-bottom">#}
@@ -103,18 +113,53 @@
         {#        </div>#}
     </div>
 </div>
-{#<script>#}
-{#    // Set some defaults to the control panel boxes.#}
-{#document.getElementById("id_cell_lines_0").checked = true;#}
-{#document.getElementById("id_treatments_0").checked = true;#}
-{#document.getElementById("id_treatments_1").checked = true;#}
-{#$("#id_time_points * input").each(function () {#}
-{#    console.log($(this))#}
-{#    $(this).prop('checked', true);#}
-{#    });#}
-{#</script>#}
+
 {{ script | safe }}
 
+<script>
+    {#Script to switch tabs in the control panel#}
+
+    function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds) {
+                break;
+            }
+        }
+    }
+
+
+    {#;#}
+
+
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    function defaultTab() {
+        document.getElementById('control_panel').style.display = "block";
+        document.getElementById('control_panel_tab').className += " active";
+    }
+
+    defaultTab();
+
+    {#sleep(1000);#}
+
+    {##}
+    if (document.readyState === "complete") {
+        document.getElementById('ctrl-panel-form').submit();
+    }
+</script>
 </body>
 </html>
 
