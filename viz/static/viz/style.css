@@ -37,16 +37,15 @@ svg {
 }
 
 /*table {*/
-    /*margin: 0 auto 0 auto;*/
+/*margin: 0 auto 0 auto;*/
 /*}*/
 
-
-div>form th{
+div > form th {
     display: block;
     text-align: right;
 }
 
-div>form td{
+div > form td {
     text-align: center;
 }
 
@@ -64,12 +63,6 @@ form {
 
 #row1 {
     height: 100%;
-}
-
-#svg-container {
-    height: 60%;
-    background-color: white;
-    width: 100%;
 }
 
 #outside-opt-container {
@@ -98,17 +91,17 @@ form {
     background-color: #383a3d;
 }
 
-.checkbox{
+.checkbox {
     width: 23px;
     height: 21px;
-    background: transparent url(http://i.stack.imgur.com/S4p2R.png ) no-repeat 0 50%;
+    background: transparent url(http://i.stack.imgur.com/S4p2R.png) no-repeat 0 50%;
 
     display: inline-block;
 }
-.checked{
-    background: transparent url(http://i.stack.imgur.com/S4p2R.png ) no-repeat 80% 50%
-}
 
+.checked {
+    background: transparent url(http://i.stack.imgur.com/S4p2R.png) no-repeat 80% 50%
+}
 
 #submit-btn {
     position: relative;
@@ -116,14 +109,12 @@ form {
     /*margin-bottom: 50px;*/
 }
 
-
-
-
-
-
-
-
-
-
+#viz-box {
+    height: 60%;
+    background-color: white;
+    width: 100%;
+    overflow: scroll;
+    padding: 25px;
+}
 
 

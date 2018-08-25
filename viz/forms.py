@@ -31,11 +31,10 @@ CELL_LINES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 CELL_LINES = [(i, i) for i in CELL_LINES]
 
 
-
-
 class DBControllerForm(forms.Form):
     genes = forms.ChoiceField(
         choices=GENES,
+        initial='ACTA2'
     )
     # genes.widget.attrs.update({
     #     'size': 27,
@@ -44,16 +43,19 @@ class DBControllerForm(forms.Form):
     cell_lines = forms.MultipleChoiceField(
         choices=CELL_LINES,
         widget=forms.CheckboxSelectMultiple,
+        initial=['A']
     )
 
     treatments = forms.MultipleChoiceField(
         choices=TREATMENTS,
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
+        initial=['TGFb', 'Control']
     )
 
     time_points = forms.MultipleChoiceField(
         choices=TIMEPOINTS,
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
+        initial=[0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
     )
     # for i in [cell_lines, time_points, treatments]:
     #     i.widget.attrs.update({

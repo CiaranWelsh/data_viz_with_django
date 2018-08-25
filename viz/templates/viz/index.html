@@ -16,12 +16,23 @@
     <meta charset="UTF-8">
     <title>viz index</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css" rel="stylesheet" type="text/css">
+
     <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
+
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
     <script>
         $(".checkbox").click(function () {
             $(this).toggleClass('checked')
         });
     </script>
+
 </head>
 <body>
 
@@ -30,6 +41,9 @@
         {#        Code for creating a navbar, left of page#}
         <div class="col-md-2 navbar" id="panel-left">
             <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href=".">HOME</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Bar Graph</a>
                 </li>
@@ -48,11 +62,8 @@
         <div class="container-fluid col">
             <h1>Title Here</h1>
 
-            {#            svg stuff where graphs will be rendered#}
-            <div class="" id="svg-container">
-                {% block content %}
-
-                {% endblock %}
+            <div class="" id="viz-box">
+                {{ div | safe }}
             </div>
 
             {#            Another control panel for selecting options#}
@@ -61,10 +72,18 @@
                 <h2 id="h2_control_panel">Control Panel</h2>
                 <div id="div-form">
                     {#                    {% block form %}#}
-                    <form action="data_table.html" id="ctrl-panel-form" name="control_panel" method="post"
+                    <form action="."
+                          id="ctrl-panel-form"
+                          name="control_panel"
+                          method="post"
                           class="form-check-inline">
                         <table border="2" class="table-dark center" id="ctrl-panel-tbl">
                             {% csrf_token %}
+                            {#                            {% for field in db_controller_form %}#}
+                            {#                                {{ field.errors }}#}
+                            {#                                {{ field.help_text}}#}
+                            {{ field }}
+                            {#                            {% endfor %}#}
                             {{ db_controller_form }}
                         </table>
                     </form>
@@ -84,29 +103,18 @@
         {#        </div>#}
     </div>
 </div>
-<script>
-    // dynamically center control panel table
-    var div_width = $("#div-form").outerWidth(includeMargin = true);
-    var tbl_width = $("#ctrl-panel-tbl").outerWidth(includeMargin = true);
-    var div_height = $("#div-form").outerHeight(includeMargin = true);
-    var tbl_height = $("#ctrl-panel-tbl").outerHeight(includeMargin = true);
+{#<script>#}
+{#    // Set some defaults to the control panel boxes.#}
+{#document.getElementById("id_cell_lines_0").checked = true;#}
+{#document.getElementById("id_treatments_0").checked = true;#}
+{#document.getElementById("id_treatments_1").checked = true;#}
+{#$("#id_time_points * input").each(function () {#}
+{#    console.log($(this))#}
+{#    $(this).prop('checked', true);#}
+{#    });#}
+{#</script>#}
+{{ script | safe }}
 
-    var spacing_width = (div_width - tbl_width) / 2;
-    var spacing_height = (div_height - tbl_height) / 2;
-
-    $("#ctrl-panel-form")
-        .css("padding-left", spacing_width.toString() + "px")
-        .css("padding-top", spacing_height.toString() + "px");
-
-    // Set some defaults to the control panel boxes.
-    document.getElementById("id_cell_lines_0").checked = true;
-    document.getElementById("id_treatments_0").checked = true;
-    document.getElementById("id_treatments_1").checked = true;
-    $("#id_time_points * input").each(function () {
-        console.log($(this))
-        $(this).prop('checked', true);
-    });
-</script>
 </body>
 </html>
 
