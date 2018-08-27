@@ -43,10 +43,7 @@
     <div class="row" id="row1">
         {#        Code for creating a navbar, left of page#}
         {#        Content, middle of page, wide col#}
-        <div class="col-1">
-
-        </div>
-        <div class="container-fluid col">
+        <div class="container-fluid col-10">
             <h1>Title Here</h1>
 
             <div class="" id="viz-box">
@@ -73,14 +70,15 @@
                               method="post"
                               class="form-check-inline">
                             {% csrf_token %}
+
                             <table border="2" class="table-dark center" id="ctrl-panel-tbl">
                                 {% for field in db_controller_form.visible_fields %}
                                     <tr>
                                         <th>
                                             {% if field.label == 'Genes' %}
-                                                <div id="genes-box">
-                                                    {{ db_controller_form.genes }}
-                                                </div>
+                                                {#                                                <div id="genes-box">#}
+                                                {#                                                    {{ db_controller_form.genes }}#}
+                                                {#                                                </div>#}
                                             {% else %}
                                                 {{ field.label_tag }}
                                             {% endif %}
@@ -156,6 +154,10 @@
                                     </td>
                                 </tr>
                             </table>
+                        <div id="genes-box" class="">
+                                {{ db_controller_form.genes }}
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -182,7 +184,7 @@
 
 <script>
     {#Script to switch tabs in the control panel#}
-
+    // function for controlling control_panel tabs
     function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -197,6 +199,7 @@
         evt.currentTarget.className += " active";
     }
 
+    // function for setting default tab
     function defaultTab() {
         document.getElementById('control_panel').style.display = "block";
         document.getElementById('control_panel_tab').className += " active";
@@ -204,6 +207,8 @@
 
     defaultTab();
 
+    // function for ticking/unticking checkboxes under <ul> tag that are in subset_list.
+    // action is boolean
     function ticker(ul_id, subset_list, action) {
         var inputs = $('#' + ul_id + ' input');
         let i;
@@ -219,15 +224,23 @@
 
     //set size of genes box
     var option_height = $('#genes-box option:first').height();
-    var window_height = $(window).height();
-    size = Math.ceil(window_height / option_height)+1;
+    var table_height= $('#ctrl-panel-tbl').height();
+    size = Math.floor(table_height/ option_height);
     $('#genes-box>select').attr('size', size);
 
     $(window).resize(function () {
 
         $('#genes-box>select').attr('size', size);
-        console.log(window_height);
+        console.log(table_height);
     });
+
+    $('#ctrl-panel-tbl').height = $('#genes-box').height;
+
+    // move genes box to better location.
+    // This was hard to do with css so will use js instead
+    {#document.getElementById('genes-box').style.left = '-110px';#}
+    {#document.getElementById('genes-box').style.top = '0px';#}
+
 
 </script>
 </body>

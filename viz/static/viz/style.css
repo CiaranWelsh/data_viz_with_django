@@ -105,7 +105,7 @@ th {
 
 #outside-opt-container {
     height: 40%;
-    background-color: #505255;
+    /*background-color: #505255;*/
 }
 
 /*#submit-btn {*/
@@ -156,11 +156,17 @@ th {
 }
 
 #genes-box {
-    font-size: 2em;
-    position: absolute;
-    top: 0;
-    left: 0;
+    font-size: 1.5em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*right: -135px;*/
 }
+
+/*#ctrl-panel-tbl {*/
+    /*height: */
+/*}*/
 
 input[type='checkbox'] {
     height: 20px;
