@@ -24,13 +24,16 @@ def plot_view(request):
         treatments = request.POST.getlist('treatments')
         time_points = request.POST.getlist('time_points')
 
-        for i in [cell_lines, genes, treatments, time_points]:
-            if i == []:
-                db_controller_form = DBControllerForm()
+        print('genes', genes)
 
-                return render(request, 'viz/index.html', {
-                    'db_controller_form': db_controller_form
-                })
+        # for i in [cell_lines, genes, treatments, time_points]:
+        #     print(i, i==[])
+        #     if i == []:
+        #         db_controller_form = DBControllerForm()
+        #
+        #         return render(request, 'viz/index.html', {
+        #             'db_controller_form': db_controller_form
+        #         })
 
         means = Mean.objects.filter(
             cell_line__in=cell_lines

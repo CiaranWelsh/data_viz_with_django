@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'viz',
     'bootstrap4',
     'django_nvd3',
+    'widget_tweaks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

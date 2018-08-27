@@ -8,7 +8,7 @@ body, html {
 
 }
 
-h1, h2, h3, p, label, option {
+h1, h2, h3, p, label {
     color: white;
     text-align: center;
 }
@@ -27,9 +27,10 @@ ul {
     width: 100%;
 }
 
-option {
-    background-color: #505255;
-}
+/*option {*/
+    /*text-color*/
+    /*background-color: #505255;*/
+/*}*/
 
 svg {
     width: 100%;
@@ -57,6 +58,9 @@ form {
     font-size: 1.25em;
 }
 
+th {
+    vertical-align: center;
+}
 /* Style the tab */
 .tab {
     overflow: hidden;
@@ -101,7 +105,7 @@ form {
 
 #outside-opt-container {
     height: 40%;
-    background-color: #505255;
+    /*background-color: #505255;*/
 }
 
 /*#submit-btn {*/
@@ -151,4 +155,20 @@ form {
     padding: 25px;
 }
 
+#genes-box {
+    font-size: 1.5em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*right: -135px;*/
+}
 
+/*#ctrl-panel-tbl {*/
+    /*height: */
+/*}*/
+
+input[type='checkbox'] {
+    height: 20px;
+    width: 20px;
+}

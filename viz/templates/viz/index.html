@@ -5,6 +5,8 @@
 
 {% load nvd3_tags %}
 
+{% load widget_tweaks %}
+
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript jquery='full' %}
@@ -37,29 +39,11 @@
 <body>
 
 <div class="container-fluid" id="container">
+
     <div class="row" id="row1">
         {#        Code for creating a navbar, left of page#}
-        <div class="col-md-2 navbar" id="panel-left">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href=".">HOME</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Bar Graph</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Line Graph</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Data Table</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Design</a>
-                </li>
-            </ul>
-        </div>
         {#        Content, middle of page, wide col#}
-        <div class="container-fluid col">
+        <div class="container-fluid col-10">
             <h1>Title Here</h1>
 
             <div class="" id="viz-box">
@@ -86,14 +70,27 @@
                               method="post"
                               class="form-check-inline">
                             {% csrf_token %}
+
                             <table border="2" class="table-dark center" id="ctrl-panel-tbl">
                                 {% for field in db_controller_form.visible_fields %}
                                     <tr>
                                         <th>
-                                            {{ field.label_tag }}
+                                            {% if field.label == 'Genes' %}
+                                                {#                                                <div id="genes-box">#}
+                                                {#                                                    {{ db_controller_form.genes }}#}
+                                                {#                                                </div>#}
+                                            {% else %}
+                                                {{ field.label_tag }}
+                                            {% endif %}
+
                                         </th>
                                         <td>
-                                            {{ field }}
+                                            {% if field.label == 'Genes' %}
+                                                {#                                                {{ field }}#}
+
+                                            {% else %}
+                                                {{ field }}
+                                            {% endif %}
                                             {#                                            {{ field.label_tag }}#}
                                             {% if field.label == 'Cell lines' %}
 
@@ -157,6 +154,10 @@
                                     </td>
                                 </tr>
                             </table>
+                        <div id="genes-box" class="">
+                                {{ db_controller_form.genes }}
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -183,20 +184,7 @@
 
 <script>
     {#Script to switch tabs in the control panel#}
-
-    function sleep(milliseconds) {
-        var start = new Date().getTime();
-        for (var i = 0; i < 1e7; i++) {
-            if ((new Date().getTime() - start) > milliseconds) {
-                break;
-            }
-        }
-    }
-
-
-    {#;#}
-
-
+    // function for controlling control_panel tabs
     function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -211,6 +199,7 @@
         evt.currentTarget.className += " active";
     }
 
+    // function for setting default tab
     function defaultTab() {
         document.getElementById('control_panel').style.display = "block";
         document.getElementById('control_panel_tab').className += " active";
@@ -218,6 +207,8 @@
 
     defaultTab();
 
+    // function for ticking/unticking checkboxes under <ul> tag that are in subset_list.
+    // action is boolean
     function ticker(ul_id, subset_list, action) {
         var inputs = $('#' + ul_id + ' input');
         let i;
@@ -230,6 +221,26 @@
             }
         }
     };
+
+    //set size of genes box
+    var option_height = $('#genes-box option:first').height();
+    var table_height= $('#ctrl-panel-tbl').height();
+    size = Math.floor(table_height/ option_height);
+    $('#genes-box>select').attr('size', size);
+
+    $(window).resize(function () {
+
+        $('#genes-box>select').attr('size', size);
+        console.log(table_height);
+    });
+
+    $('#ctrl-panel-tbl').height = $('#genes-box').height;
+
+    // move genes box to better location.
+    // This was hard to do with css so will use js instead
+    {#document.getElementById('genes-box').style.left = '-110px';#}
+    {#document.getElementById('genes-box').style.top = '0px';#}
+
 
 </script>
 </body>
