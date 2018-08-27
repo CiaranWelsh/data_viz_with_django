@@ -104,11 +104,11 @@ form {
     background-color: #505255;
 }
 
-#submit-btn {
-    position: relative;
-    top: 25px;
-    left: 50%;
-}
+/*#submit-btn {*/
+    /*position: relative;*/
+    /*top: 25px;*/
+    /*left: 50%;*/
+/*}*/
 
 #ctrl-panel-tbl {
     width: 100%;
@@ -137,11 +137,11 @@ form {
     background: transparent url(http://i.stack.imgur.com/S4p2R.png) no-repeat 80% 50%
 }
 
-#submit-btn {
-    position: relative;
+/*#submit-btn {*/
+    /*position: relative;*/
     /*bottom: 25px;*/
     /*margin-bottom: 50px;*/
-}
+/*}*/
 
 #viz-box {
     height: 60%;

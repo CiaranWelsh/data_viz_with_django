@@ -87,28 +87,77 @@
                               class="form-check-inline">
                             {% csrf_token %}
                             <table border="2" class="table-dark center" id="ctrl-panel-tbl">
-                                {{ db_controller_form }}
+                                {% for field in db_controller_form.visible_fields %}
+                                    <tr>
+                                        <th>
+                                            {{ field.label_tag }}
+                                        </th>
+                                        <td>
+                                            {{ field }}
+                                            {#                                            {{ field.label_tag }}#}
+                                            {% if field.label == 'Cell lines' %}
+
+                                                <div class="btn-group-lg">
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">
+                                                        Neonatal
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">
+                                                        Senescent
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">
+                                                        Adult
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
+                                                        All
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_cell_lines', [], true);">
+                                                        None
+                                                    </button>
+                                                </div>
+
+                                            {% elif field.label == 'Treatments' %}
+                                                <div class="btn-group-lg">
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">
+                                                        Both
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_treatments', [], true);">
+                                                        Neither
+                                                    </button>
+                                                </div>
+
+                                            {% elif field.label == 'Time points' %}
+                                                <div class="btn-group-lg">
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">
+                                                        All
+                                                    </button>
+                                                    <button type="button" class="btn btn-lg"
+                                                            onclick="ticker('id_time_points', [], true);">
+                                                        None
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <th></th>
+                                    <td>
+                                        <div>
+                                            <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
+                                                   form="ctrl-panel-form">
+                                        </div>
+                                    </td>
+                                </tr>
                             </table>
                         </form>
-                    </div>
-                    <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
-                    <div>
-                        <button onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">Neonatal</button>
-                        <button onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">Senescent</button>
-                        <button onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">Adult</button>
-                        <button onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
-                            All
-                        </button>
-                        <button onclick="ticker('id_cell_lines', [], true);">None</button>
-                    </div>
-                    <div>
-                    <button onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">Both</button>
-                    <button onclick="ticker('id_treatments', [], true);">Neither</button>
-
-                    </div>
-                    <div>
-                        <button onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">All</button>
-                        <button onclick="ticker('id_time_points', [], true);">None</button>
                     </div>
                 </div>
 
