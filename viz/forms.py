@@ -34,10 +34,13 @@ CELL_LINES = [(i, i) for i in CELL_LINES]
 class DBControllerForm(forms.Form):
     checkbox_classes = 'form-check-input'
 
-    genes = forms.ChoiceField(
+    genes = forms.MultipleChoiceField(
         choices=GENES,
-        initial='ACTA2'
+        initial=['ACTA2']
     )
+    genes.widget.attrs.update({'class': 'custom-select',
+                               'multiple': 'multiple',
+                               'name': 'genes_dropdown'})
     # genes.widget.attrs.update({
     #     'size': 27,
     # })
