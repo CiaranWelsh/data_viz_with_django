@@ -85,15 +85,31 @@
                               name="control_panel"
                               method="post"
                               class="form-check-inline">
+                            {% csrf_token %}
                             <table border="2" class="table-dark center" id="ctrl-panel-tbl">
-                                {% csrf_token %}
-                                {{ field }}
                                 {{ db_controller_form }}
                             </table>
                         </form>
                     </div>
                     <input type="submit" value="Submit" class="btn" id="submit-btn" form="ctrl-panel-form">
+                    <div>
+                        <button onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">Neonatal</button>
+                        <button onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">Senescent</button>
+                        <button onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">Adult</button>
+                        <button onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
+                            All
+                        </button>
+                        <button onclick="ticker('id_cell_lines', [], true);">None</button>
+                    </div>
+                    <div>
+                    <button onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">Both</button>
+                    <button onclick="ticker('id_treatments', [], true);">Neither</button>
 
+                    </div>
+                    <div>
+                        <button onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">All</button>
+                        <button onclick="ticker('id_time_points', [], true);">None</button>
+                    </div>
                 </div>
 
 
@@ -153,12 +169,19 @@
 
     defaultTab();
 
-    {#sleep(1000);#}
+    function ticker(ul_id, subset_list, action) {
+        var inputs = $('#' + ul_id + ' input');
+        let i;
+        for (i = 0; i < inputs.length; i++) {
+            inputs[i].checked = false;
+            if ($.inArray(inputs[i].value, subset_list) >= 0) {
+                if (action = true) {
+                    inputs[i].checked = true;
+                }
+            }
+        }
+    };
 
-    {##}
-    if (document.readyState === "complete") {
-        document.getElementById('ctrl-panel-form').submit();
-    }
 </script>
 </body>
 </html>

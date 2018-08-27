@@ -43,13 +43,13 @@ class DBControllerForm(forms.Form):
     cell_lines = forms.MultipleChoiceField(
         choices=CELL_LINES,
         widget=forms.CheckboxSelectMultiple,
-        initial=['A']
+        initial=['A', 'D', 'G']
     )
 
     treatments = forms.MultipleChoiceField(
         choices=TREATMENTS,
         widget=forms.CheckboxSelectMultiple,
-        initial=['TGFb', 'Control']
+        initial=['TGFb']
     )
 
     time_points = forms.MultipleChoiceField(
