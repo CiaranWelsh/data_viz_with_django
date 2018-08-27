@@ -149,11 +149,13 @@ def plot_view(request):
                         err_xs, err_ys,
                         line_width=4,
                         color=col,
-                        alpha=0.5
+                        alpha=0.5,
+                        legend=legend_label[0]
                     )
 
         plot.legend.label_text_font_size = '20pt'
         plot.legend.location = 'top_left'
+        plot.legend.click_policy = 'hide'
 
         script, div = components(plot)
 
