@@ -133,6 +133,8 @@ th {
     /*margin-bottom: 50px;*/
 /*}*/
 
+
+
 #viz-box {
     height: 60%;
     background-color: white;
@@ -162,3 +164,22 @@ input[type='checkbox'] {
     height: 20px;
     width: 20px;
 }
+
+
+.vertical-menu a {
+    background-color: #564e56;
+    color: antiquewhite;
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+}
+
+.vertical-menu a:hover {
+    background-color: #8a8a8a;
+}
+
+.vertical-menu a.active {
+    background-color: #22ca00;
+    color: white;
+}
+

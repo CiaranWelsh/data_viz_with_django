@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.forms import ModelForm
@@ -15,9 +15,25 @@ import bokeh.palettes as palettes
 from itertools import cycle
 
 
+def base_view(request):
+    """
+    simply redirect user to index.html
+    :param request:
+    :return:
+    """
+    return redirect('index.html')
+
 
 def plot_view(request):
+    """
+    Django view to plot line graph based on post request parameters
+    :param request:
+    :return:
+    """
+    print('request type: ', request.method)
     if request.method == 'POST':
+
+        print('post request from plot_view (index)')
 
         cell_lines = request.POST.getlist('cell_lines')
         genes = request.POST.getlist('genes')
@@ -25,13 +41,16 @@ def plot_view(request):
         time_points = request.POST.getlist('time_points')
 
         print('genes', genes)
+        print('cell_linres', cell_lines)
+        print('treatments', treatments)
+        print('time', time_points)
 
         # for i in [cell_lines, genes, treatments, time_points]:
         #     print(i, i==[])
         #     if i == []:
         #         db_controller_form = DBControllerForm()
         #
-        #         return render(request, 'viz/index.html', {
+        #         return render(request, 'viz/base.html', {
         #             'db_controller_form': db_controller_form
         #         })
 
@@ -119,8 +138,6 @@ def plot_view(request):
                 yield c
 
         cols = colour_gen()
-        legend_items = []
-        err_data = {}
         for cl in sorted(list(set(means.index.get_level_values(0)))):
             for tr in sorted(list(set(means.index.get_level_values(1)))):
                 for g in sorted(list(set(means.index.get_level_values(2)))):
@@ -188,64 +205,28 @@ def plot_view(request):
         return render(request, 'viz/index.html', context=context)
 
     else:
-
+        print('get request from plot_view (index)')
         db_controller_form = DBControllerForm()
 
         return render(request, 'viz/index.html', {
             'db_controller_form': db_controller_form
         })
 
-#
-# def plot_view(request):
-#     if request.method == 'POST':
-#
-#         cell_lines = request.POST.getlist('cell_lines')
-#         genes = request.POST.getlist('genes')
-#         treatments = request.POST.getlist('treatments')
-#         time_points = request.POST.getlist('time_points')
-#         data = Dct.objects.filter(
-#             cell_line__in=cell_lines
-#         ).filter(
-#             gene__in=genes
-#         ).filter(
-#             treatment__in=treatments
-#         ).filter(
-#             time__in=time_points
-#         )
-#         df = read_frame(data)
-#         json = df.to_json(orient='records')
-#
-#         x = [1, 3, 5, 7, 9, 11, 13]
-#         y = [1, 2, 3, 4, 5, 6, 7]
-#         title = 'y = f(x)'
-#
-#         plot = figure(title=title,
-#                       x_axis_label='X-Axis',
-#                       y_axis_label='Y-Axis',
-#                       plot_width=400,
-#                       plot_height=400)
-#
-#         plot.line(x, y, legend='f(x)', line_width=2)
-#         # Store components
-#         script, div = components(plot)
-#
-#         db_controller_form = DBControllerForm()
-#
-#         context = {
-#             'data': df.to_html(),
-#             'json': json,
-#             'columns': df.columns,
-#             'db_controller_form': db_controller_form,
-#             'script': script,
-#             'div': div,
-#         }
-#         return render(request, 'viz/index.html', context=context)
-#         # return render(request, '.', context)
-#
-#     else:
-#
-#         db_controller_form = DBControllerForm()
-#
-#         return render(request, 'viz/index.html', {
-#             'db_controller_form': db_controller_form
-#         })
+
+
+
+def data_table_view(request):
+    return HttpResponse('data table view')
+
+
+def pca_view(request):
+    return HttpResponse('pca view')
+
+
+
+
+
+
+
+
+

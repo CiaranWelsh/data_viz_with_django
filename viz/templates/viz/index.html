@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-{% load static %}
+{#This file displays a box plot based on user options#}
+{% extends "viz/base.html" %}
+
+{% load staticfiles %}
 {# Load the tag library #}
 {% load bootstrap4 %}
-
-{% load nvd3_tags %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
@@ -11,252 +11,150 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>viz index</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css" rel="stylesheet" type="text/css">
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css" rel="stylesheet" type="text/css">
 
-    <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
+{# main content #}
+{% block viz_box_content %}
+    {{ div | safe }}
+{% endblock %}
 
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
-    <script>
-        $(".checkbox").click(function () {
-            $(this).toggleClass('checked')
-        });
-    </script>
+{% block tab_content %}
+    <div class="tab">
+        <button class="tablinks"
+                onClick="openTab(event, 'control_panel')"
+                id="control_panel_tab">Control Panel
+        </button>
+        <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
+    </div>
 
-</head>
-<body>
+    <div class="" id="outside-opt-container">
+        <div class="tabcontent" id="control_panel">
+            {#                    {% block form %}#}
+            <div>
+                <form action="."
+                      id="ctrl-panel-form"
+                      name="control_panel"
+                      method="post"
+                      class="form-check-inline">
+                    {% csrf_token %}
 
-<div class="container-fluid" id="container">
+                    <table border="2" class="table-dark center" id="ctrl-panel-tbl">
+                        {% for field in db_controller_form.visible_fields %}
+                            <tr>
+                                <th>
+                                    {% if field.label == 'Genes' %}
+                                        {#                                                <div id="genes-box">#}
+                                        {#                                                    {{ db_controller_form.genes }}#}
+                                        {#                                                </div>#}
+                                    {% else %}
+                                        {{ field.label_tag }}
+                                    {% endif %}
 
-    <div class="row" id="row1">
-        {#        Code for creating a navbar, left of page#}
-        {#        Content, middle of page, wide col#}
-        <div class="container-fluid col-10">
-            <h1>Title Here</h1>
+                                </th>
+                                <td>
+                                    {% if field.label == 'Genes' %}
+                                        {#                                                {{ field }}#}
 
-            <div class="" id="viz-box">
-                {{ div | safe }}
-            </div>
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                    {#                                            {{ field.label_tag }}#}
+                                    {% if field.label == 'Cell lines' %}
 
-            {#            Another control panel for selecting options#}
-            <div class="tab">
-                <button class="tablinks"
-                        onClick="openTab(event, 'control_panel')"
-                        id="control_panel_tab">Control Panel
-                </button>
-                <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
-            </div>
-
-            <div class="" id="outside-opt-container">
-
-                <div class="tabcontent" id="control_panel">
-                    {#                    {% block form %}#}
-                    <div>
-                        <form action="."
-                              id="ctrl-panel-form"
-                              name="control_panel"
-                              method="post"
-                              class="form-check-inline">
-                            {% csrf_token %}
-
-                            <table border="2" class="table-dark center" id="ctrl-panel-tbl">
-                                {% for field in db_controller_form.visible_fields %}
-                                    <tr>
-                                        <th>
-                                            {% if field.label == 'Genes' %}
-                                                {#                                                <div id="genes-box">#}
-                                                {#                                                    {{ db_controller_form.genes }}#}
-                                                {#                                                </div>#}
-                                            {% else %}
-                                                {{ field.label_tag }}
-                                            {% endif %}
-
-                                        </th>
-                                        <td>
-                                            {% if field.label == 'Genes' %}
-                                                {#                                                {{ field }}#}
-
-                                            {% else %}
-                                                {{ field }}
-                                            {% endif %}
-                                            {#                                            {{ field.label_tag }}#}
-                                            {% if field.label == 'Cell lines' %}
-
-                                                <div class="btn-group-lg">
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">
-                                                        Neonatal
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">
-                                                        Senescent
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">
-                                                        Adult
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
-                                                        All
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_cell_lines', [], true);">
-                                                        None
-                                                    </button>
-                                                </div>
-
-                                            {% elif field.label == 'Treatments' %}
-                                                <div class="btn-group-lg">
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">
-                                                        Both
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_treatments', [], true);">
-                                                        Neither
-                                                    </button>
-                                                </div>
-
-                                            {% elif field.label == 'Time points' %}
-                                                <div class="btn-group-lg">
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">
-                                                        All
-                                                    </button>
-                                                    <button type="button" class="btn btn-lg"
-                                                            onclick="ticker('id_time_points', [], true);">
-                                                        None
-                                                    </button>
-                                                </div>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                <tr>
-                                    <th></th>
-                                    <td>
-                                        <div>
-                                            <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
-                                                   form="ctrl-panel-form">
+                                        <div class="btn-group-lg">
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">
+                                                Neonatal
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">
+                                                Senescent
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">
+                                                Adult
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
+                                                All
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_cell_lines', [], true);">
+                                                None
+                                            </button>
                                         </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        <div id="genes-box" class="">
-                                {{ db_controller_form.genes }}
-                            </div>
 
-                        </form>
+                                    {% elif field.label == 'Treatments' %}
+                                        <div class="btn-group-lg">
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">
+                                                Both
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_treatments', [], true);">
+                                                Neither
+                                            </button>
+                                        </div>
+
+                                    {% elif field.label == 'Time points' %}
+                                        <div class="btn-group-lg">
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">
+                                                All
+                                            </button>
+                                            <button type="button" class="btn btn-lg"
+                                                    onclick="ticker('id_time_points', [], true);">
+                                                None
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <th></th>
+                            <td>
+                                <div>
+                                    <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
+                                           form="ctrl-panel-form">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="genes-box" class="">
+                        {{ db_controller_form.genes }}
                     </div>
-                </div>
 
+                </form>
+            </div>
+        </div>
 
-                <div class="tabcontent" id="legend">
-                    <h2>legend</h2>
-                    <div class="col-3"></div>
-                    <div class="col-6">
-                        <button>Top Left</button>
-                        <button>Top Right</button>
-                        <button>Bottom Left</button>
-                        <button>Bottom Right</button>
-                        <button>Off</button>
-                    </div>
+        <div class="tabcontent" id="legend">
+            <h2>legend</h2>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <button>Top Left</button>
+                <button>Top Right</button>
+                <button>Bottom Left</button>
+                <button>Bottom Right</button>
+                <button>Off</button>
+            </div>
 
-                    <div class="col-3">
+            <div class="col-3">
 
-                    </div>
-
-                </div>
             </div>
 
         </div>
-        {#        Control panel stuff, right of page#}
-        {#        <div class="col-2 panel-right">#}
-        {#            <div class="top-to-bottom">#}
-        {#                <div class="row" , id="right">#}
-        {#                    {{ db_controller_form.genes }}#}
-        {#                </div>#}
-        {#            </div>#}
-        {#        </div>#}
     </div>
-</div>
-
-{{ script | safe }}
-
-<script>
-    {#Script to switch tabs in the control panel#}
-    // function for controlling control_panel tabs
-    function openTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(tabName).style.display = "block";
-        evt.currentTarget.className += " active";
-    }
-
-    // function for setting default tab
-    function defaultTab() {
-        document.getElementById('control_panel').style.display = "block";
-        document.getElementById('control_panel_tab').className += " active";
-    }
-
-    defaultTab();
-
-    // function for ticking/unticking checkboxes under <ul> tag that are in subset_list.
-    // action is boolean
-    function ticker(ul_id, subset_list, action) {
-        var inputs = $('#' + ul_id + ' input');
-        let i;
-        for (i = 0; i < inputs.length; i++) {
-            inputs[i].checked = false;
-            if ($.inArray(inputs[i].value, subset_list) >= 0) {
-                if (action = true) {
-                    inputs[i].checked = true;
-                }
-            }
-        }
-    };
-
-    //set size of genes box
-    var option_height = $('#genes-box option:first').height();
-    var table_height= $('#ctrl-panel-tbl').height();
-    size = Math.floor(table_height/ option_height);
-    $('#genes-box>select').attr('size', size);
-
-    $(window).resize(function () {
-
-        $('#genes-box>select').attr('size', size);
-        console.log(table_height);
-    });
-
-    $('#ctrl-panel-tbl').height = $('#genes-box').height;
-
-    // move genes box to better location.
-    // This was hard to do with css so will use js instead
-    {#document.getElementById('genes-box').style.left = '-110px';#}
-    {#document.getElementById('genes-box').style.top = '0px';#}
+{% endblock %}
 
 
-</script>
-</body>
-</html>
+{% block js %}
+    {{ script | safe }}
 
+    <script src="{% static 'viz/index.js' %}" type="text/javascript"></script>
+
+{% endblock %}
 
 
 

@@ -20,7 +20,8 @@ from viz import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.get_name, {}, name='index'),
-    path('', views.plot_view, {}, name='plot'),
-    # path('index.html', views.db_controller_view, {}, name='db_controller'),
-    # path('data_table.html', views.data_table_view, {}, name='data_table'),
+    # path('', views.base_view, {}, name='base'),
+    path('', views.plot_view, {}, name='index'),
+    path('data_table.html', views.data_table_view, {}, name='data_table'),
+    path('pca.html', views.pca_view, {}, name='pca')
 ]
