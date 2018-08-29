@@ -12,6 +12,23 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
+{% block navitem_data_table %}active{% endblock navitem_data_table%}
+{% block navitem_line_plots %}{% endblock navitem_line_plots%}
+
+{% block viz_box_content %}
+    {{ div | safe }}
+{% endblock %}
+
+{% block tab_content %}
+    {% include 'viz/options.html' %}
+{% endblock %}
+
+{% block js %}
+    {{ script | safe }}
+
+    <script src="{% static 'viz/index.js' %}" type="text/javascript"></script>
+
+{% endblock %}
 
 {# main content #}
 {#{% block viz_box_content %}#}

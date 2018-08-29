@@ -10,6 +10,7 @@ from django_pandas.io import read_frame
 
 from bokeh.plotting import figure
 from bokeh.models import Legend, Whisker, ColumnDataSource
+from bokeh.models.widgets import DataTable, TableColumn
 from bokeh.embed import components
 import bokeh.palettes as palettes
 from itertools import cycle
@@ -24,6 +25,84 @@ def base_view(request):
     return redirect('index.html')
 
 
+def form_handler(request):
+    cell_lines = request.POST.getlist('cell_lines')
+    genes = request.POST.getlist('genes')
+    treatments = request.POST.getlist('treatments')
+    time_points = request.POST.getlist('time_points')
+
+    # print('genes', genes)
+    # print('cell_linres', cell_lines)
+    # print('treatments', treatments)
+    # print('time', time_points)
+
+    # for i in [cell_lines, genes, treatments, time_points]:
+    #     print(i, i==[])
+    #     if i == []:
+    #         db_controller_form = DBControllerForm()
+    #
+    #         return render(request, 'viz/base.html', {
+    #             'db_controller_form': db_controller_form
+    #         })
+
+    means = Mean.objects.filter(
+        cell_line__in=cell_lines
+    ).filter(
+        gene__in=genes
+    ).filter(
+        treatment__in=treatments
+    ).filter(
+        time__in=time_points
+    )
+
+    sems = Sem.objects.filter(
+        cell_line__in=cell_lines
+    ).filter(
+        gene__in=genes
+    ).filter(
+        treatment__in=treatments
+    ).filter(
+        time__in=time_points
+    )
+
+    stds = Std.objects.filter(
+        cell_line__in=cell_lines
+    ).filter(
+        gene__in=genes
+    ).filter(
+        treatment__in=treatments
+    ).filter(
+        time__in=time_points
+    )
+
+    means = read_frame(means, index_col='index')
+    sems = read_frame(sems, index_col='index')
+    stds = read_frame(stds, index_col='index')
+
+    means = means.pivot_table(
+        values='value',
+        index=['cell_line', 'treatment', 'gene'],
+        columns='time',
+    )
+    sems = sems.pivot_table(
+        values='value',
+        index=['cell_line', 'treatment', 'gene'],
+        columns='time',
+    )
+    stds = stds.pivot_table(
+        values='value',
+        index=['cell_line', 'treatment', 'gene'],
+        columns='time',
+    )
+    return {'means': means,
+            'sems': sems,
+            'stds': stds,
+            'genes': genes,
+            'cell_lines': cell_lines,
+            'treatments': treatments,
+            'time_points': time_points}
+
+
 def plot_view(request):
     """
     Django view to plot line graph based on post request parameters
@@ -35,74 +114,7 @@ def plot_view(request):
 
         print('post request from plot_view (index)')
 
-        cell_lines = request.POST.getlist('cell_lines')
-        genes = request.POST.getlist('genes')
-        treatments = request.POST.getlist('treatments')
-        time_points = request.POST.getlist('time_points')
-
-        print('genes', genes)
-        print('cell_linres', cell_lines)
-        print('treatments', treatments)
-        print('time', time_points)
-
-        # for i in [cell_lines, genes, treatments, time_points]:
-        #     print(i, i==[])
-        #     if i == []:
-        #         db_controller_form = DBControllerForm()
-        #
-        #         return render(request, 'viz/base.html', {
-        #             'db_controller_form': db_controller_form
-        #         })
-
-        means = Mean.objects.filter(
-            cell_line__in=cell_lines
-        ).filter(
-            gene__in=genes
-        ).filter(
-            treatment__in=treatments
-        ).filter(
-            time__in=time_points
-        )
-
-        sems = Sem.objects.filter(
-            cell_line__in=cell_lines
-        ).filter(
-            gene__in=genes
-        ).filter(
-            treatment__in=treatments
-        ).filter(
-            time__in=time_points
-        )
-
-        stds = Std.objects.filter(
-            cell_line__in=cell_lines
-        ).filter(
-            gene__in=genes
-        ).filter(
-            treatment__in=treatments
-        ).filter(
-            time__in=time_points
-        )
-
-        means = read_frame(means, index_col='index')
-        sems = read_frame(sems, index_col='index')
-        stds = read_frame(stds, index_col='index')
-
-        means = means.pivot_table(
-            values='value',
-            index=['cell_line', 'treatment', 'gene'],
-            columns='time',
-        )
-        sems = sems.pivot_table(
-            values='value',
-            index=['cell_line', 'treatment', 'gene'],
-            columns='time',
-        )
-        stds = stds.pivot_table(
-            values='value',
-            index=['cell_line', 'treatment', 'gene'],
-            columns='time',
-        )
+        form_data = form_handler(request)
 
         TOOLS = "pan,wheel_zoom,box_zoom,reset,save,box_select"
 
@@ -123,9 +135,9 @@ def plot_view(request):
         plot.ygrid.visible = False
 
         num_colours_needed = 0
-        for cl in sorted(list(set(means.index.get_level_values(0)))):
-            for tr in sorted(list(set(means.index.get_level_values(1)))):
-                for g in sorted(list(set(means.index.get_level_values(2)))):
+        for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
+            for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
+                for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
                     num_colours_needed += 1
 
         if num_colours_needed <= 2:
@@ -138,13 +150,13 @@ def plot_view(request):
                 yield c
 
         cols = colour_gen()
-        for cl in sorted(list(set(means.index.get_level_values(0)))):
-            for tr in sorted(list(set(means.index.get_level_values(1)))):
-                for g in sorted(list(set(means.index.get_level_values(2)))):
+        for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
+            for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
+                for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
 
                     col = cols.__next__()
-                    plot_data = means.loc[cl, tr, g]
-                    err_data = sems.loc[cl, tr, g]
+                    plot_data = form_data['means'].loc[cl, tr, g]
+                    err_data = form_data['sems'].loc[cl, tr, g]
 
                     legend_label = '{}_{}_{}'.format(g, cl, tr),
 
@@ -189,15 +201,16 @@ def plot_view(request):
         script, div = components(plot)
 
         context = {
-            'means': means,
-            'sems': sems,
-            'stds': stds,
+            'means': form_data['means'],
+            'sems': form_data['sems'],
+            'stds': form_data['stds'],
             'db_controller_form': DBControllerForm(initial={
-                'cell_lines': cell_lines,
-                'treatments': treatments,
-                'genes': genes,
-                'time_points': time_points
+                'cell_lines': form_data['cell_lines'],
+                'treatments': form_data['treatments'],
+                'genes': form_data['genes'],
+                'time_points': form_data['time_points']
             }),
+            'action': '.',
             'script': script,
             'div': div
         }
@@ -209,24 +222,69 @@ def plot_view(request):
         db_controller_form = DBControllerForm()
 
         return render(request, 'viz/index.html', {
-            'db_controller_form': db_controller_form
+            'db_controller_form': db_controller_form,
+            'action': '.',
         })
 
 
-
-
 def data_table_view(request):
-    return HttpResponse('data table view')
+    if request.method == 'POST':
+
+        form_data = form_handler(request)
+
+        # print(form_data)
+
+        data = dict(
+            mean=form_data['means'],
+            SEM=form_data['sems']
+        )
+        source = ColumnDataSource(data)
+
+        columns = [
+            TableColumn(field='means', title='means'),
+            TableColumn(field='sems', title='sems'),
+        ]
+        data_table = DataTable(source=source, columns=columns)
+
+        script, div = components(data_table)
+
+        context = {
+            'means': form_data['means'],
+            'sems': form_data['sems'],
+            'stds': form_data['stds'],
+            'db_controller_form': DBControllerForm(initial={
+                'cell_lines': form_data['cell_lines'],
+                'treatments': form_data['treatments'],
+                'genes': form_data['genes'],
+                'time_points': form_data['time_points']
+            }),
+            'action': r'data_table.html',
+            'script': script,
+            'div': div
+        }
+
+        return render(request, 'viz/data_table.html', context)
+
+    else:
+        print('get request from data table')
+        db_controller_form = DBControllerForm()
+
+        return render(request, 'viz/data_table.html', {
+            'db_controller_form': db_controller_form,
+            'action': 'data_table.html',
+        })
 
 
 def pca_view(request):
-    return HttpResponse('pca view')
+    if request.method == 'POST':
+        return HttpResponse('pca')
 
+    else:
+        print('get request from plot_view (index)')
+        db_controller_form = DBControllerForm()
 
+        return render(request, 'viz/pca.html', {
+            'db_controller_form': db_controller_form,
+            'action': 'viz/index.html',
 
-
-
-
-
-
-
+        })

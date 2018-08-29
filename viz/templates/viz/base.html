@@ -42,9 +42,9 @@
         <div class="container-fluid col-1 h-100">
             <div class="row h-100 justify-content-center align-items-center">
                 <nav class="vertical-menu flex-column" style="position: fixed;">
-                    <a class="active" href=".">Line Plots</a>
-                    <a href="data_table.html">Data Table</a>
-                    <a href="pca.html">PCA</a>
+                    <a class="{% block navitem_line_plots %}{% endblock navitem_line_plots %}" href=".">Line Plots</a>
+                    <a class="{% block navitem_data_table %}{% endblock navitem_data_table %}" href="data_table.html">Data Table</a>
+                    <a class="{% block navitem_pca %}{% endblock navitem_pca %}" href="pca.html">PCA</a>
                 </nav>
             </div>
         </div>
@@ -69,6 +69,11 @@
 {% block js %}
 {% endblock %}
 
+<script>
+    function activate(id){
+
+    }
+</script>
 </body>
 </html>
 
