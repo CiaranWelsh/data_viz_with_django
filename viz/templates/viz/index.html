@@ -12,8 +12,14 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
-{% block navitem_line_plots %}active{% endblock navitem_line_plots%}
+{% block extra_stylesheets %}
+    <link rel="stylesheet" href="{% static 'viz/index_style.css' %}" type="text/css">
+{% endblock extra_stylesheets %}
+
+{% block navitem_line_plots %}active{% endblock navitem_line_plots %}
 {# main content #}
+
+
 {% block viz_box_content %}
     {{ div | safe }}
 {% endblock %}
@@ -21,6 +27,7 @@
 {% block tab_content %}
     {% include 'viz/options.html' %}
     {% block form_action %}viz/index.html{% endblock %}
+{#    {% block form_submit_button %}  {% endblock form_submit_button %}#}
 {% endblock %}
 
 

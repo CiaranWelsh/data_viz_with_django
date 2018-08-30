@@ -1,0 +1,28 @@
+.bk-root {
+    margin: auto;
+    padding: 10px;
+}
+
+.slick-column-name {
+    font-size: 2em;
+}
+
+.slick-cell {
+    font-size: 1.5em;
+}
+
+.slick-column-name, .slick-cell {
+    text-align: center;
+}
+
+#viz-box {
+    overflow: hidden;
+}
+
+#div_download_button {
+    float: right;
+    /*position: relative;*/
+    /*bottom: 20px;*/
+    /*height: 100%*/
+}
+

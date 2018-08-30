@@ -9,8 +9,8 @@ from .forms import DBControllerForm
 from django_pandas.io import read_frame
 
 from bokeh.plotting import figure
-from bokeh.models import Legend, Whisker, ColumnDataSource
-from bokeh.models.widgets import DataTable, TableColumn
+from bokeh.models import Legend, Whisker, ColumnDataSource, CustomJS
+from bokeh.models.widgets import DataTable, TableColumn, NumberFormatter, Button
 from bokeh.embed import components
 import bokeh.palettes as palettes
 from itertools import cycle
@@ -226,29 +226,64 @@ def plot_view(request):
             'action': '.',
         })
 
+def process_form(data):
+    means = pandas.DataFrame(data['means'].stack(), columns=['Mean'])
+    sems = pandas.DataFrame(data['sems'].stack(), columns=['SEM'])
+    df = pandas.concat([means, sems], axis=1).reset_index()
+
+    cell_line_type_vec = []
+    for i in df.cell_line:
+        if i in ['A', 'B', 'C']:
+            cell_line_type_vec.append('Neonatal')
+        elif i in ['D', 'E', 'F']:
+            cell_line_type_vec.append('Senescent')
+        elif i in ['G', 'H', 'I']:
+            cell_line_type_vec.append('Adult')
+    df['cell_group'] = cell_line_type_vec
+    return df
 
 def data_table_view(request):
+
     if request.method == 'POST':
 
         form_data = form_handler(request)
+        df = process_form(form_data)
 
-        # print(form_data)
-
-        data = dict(
-            mean=form_data['means'],
-            SEM=form_data['sems']
-        )
-        source = ColumnDataSource(data)
-
+        data = ColumnDataSource(df)
+        # print(request.GET.get('width'))
+        width = int(int(request.GET.get('width', 1000)) / 7)
+        # print('new_width = ', width)
         columns = [
-            TableColumn(field='means', title='means'),
-            TableColumn(field='sems', title='sems'),
+            TableColumn(field='cell_group', title='Cell Group', width=width),
+            TableColumn(field='cell_line', title='Cell Line', width=int(width*0.5)),
+            TableColumn(field='treatment', title='Treatment', width=int(width*0.7)),
+            TableColumn(field='gene', title='Gene', width=width),
+            TableColumn(field='time', title='Time', width=int(width*0.5)),
+            TableColumn(field='Mean', title='Mean', width=width, formatter=NumberFormatter(format='0.0000')),
+            TableColumn(field='SEM', title='SEM', width=width, formatter=NumberFormatter(format='0.0000'))
         ]
-        data_table = DataTable(source=source, columns=columns)
+
+        table_width = int(float(request.GET.get('width')) - 100)
+
+        data_table = DataTable(
+            source=data,
+            columns=columns,
+            fit_columns=False,
+            selectable=True,
+            width=table_width,
+        )
 
         script, div = components(data_table)
 
+        callback = CustomJS(code="function() {window.alert('callback mother fucker';};")
+        btn = Button(label='Download as csv', button_type='success', callback=callback)
+
+        btn_script, btn_div = components(btn)
+        print(btn_script)
+        print(btn_div)
+
         context = {
+            'data': data,
             'means': form_data['means'],
             'sems': form_data['sems'],
             'stds': form_data['stds'],
@@ -258,9 +293,11 @@ def data_table_view(request):
                 'genes': form_data['genes'],
                 'time_points': form_data['time_points']
             }),
-            'action': r'data_table.html',
+            'action': r'data_table?width={}'.format(request.GET.get('width', 500)),
             'script': script,
-            'div': div
+            'div': div,
+            'btn_script': btn_script,
+            'btn_div': btn_div,
         }
 
         return render(request, 'viz/data_table.html', context)
@@ -271,9 +308,19 @@ def data_table_view(request):
 
         return render(request, 'viz/data_table.html', {
             'db_controller_form': db_controller_form,
-            'action': 'data_table.html',
+            'action': r'data_table?width={}'.format(request.GET.get('width', 500)),
         })
 
+
+def download_button_view(request):
+    form_data = form_handler(request)
+    df = process_form(form_data)
+    df = df[['cell_group', 'cell_line', 'treatment', 'gene', 'time', 'Mean', 'SEM']]
+    print(df)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=data.csv'
+    df.to_csv(path_or_buf=response, sep=',', index=False)
+    return response
 
 def pca_view(request):
     if request.method == 'POST':
@@ -286,5 +333,4 @@ def pca_view(request):
         return render(request, 'viz/pca.html', {
             'db_controller_form': db_controller_form,
             'action': 'viz/index.html',
-
         })

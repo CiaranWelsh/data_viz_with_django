@@ -19,18 +19,19 @@
     <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css" rel="stylesheet" type="text/css">
 
-    <link rel="stylesheet" href="{% static 'viz/style.css' %}" type="text/css">
-
+    {#    <link rel="stylesheet" href="{% static 'viz/index_style.css' %}" type="text/css">#}
+    {% block extra_stylesheets %}
+    {% endblock extra_stylesheets %}
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
-    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.js"></script>
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
 
-    <script>
-        $(".checkbox").click(function () {
-            $(this).toggleClass('checked')
-        });
-    </script>
+
+
+    {% block js_start %}
+
+    {% endblock %}
 
 </head>
 <body>
@@ -43,8 +44,9 @@
             <div class="row h-100 justify-content-center align-items-center">
                 <nav class="vertical-menu flex-column" style="position: fixed;">
                     <a class="{% block navitem_line_plots %}{% endblock navitem_line_plots %}" href=".">Line Plots</a>
-                    <a class="{% block navitem_data_table %}{% endblock navitem_data_table %}" href="data_table.html">Data Table</a>
-                    <a class="{% block navitem_pca %}{% endblock navitem_pca %}" href="pca.html">PCA</a>
+                    <a id="navitem-data-table" class="{% block navitem_data_table %}{% endblock navitem_data_table %}"
+                       href="data_table">Data Table</a>
+                    <a class="{% block navitem_pca %}{% endblock navitem_pca %}" href="pca">PCA</a>
                 </nav>
             </div>
         </div>
@@ -69,11 +71,18 @@
 {% block js %}
 {% endblock %}
 
-<script>
-    function activate(id){
+{% block extra_scripts %}
 
-    }
+{% endblock extra_scripts %}
+
+<script>
+    // get width of viz box
+    var viz_box_width = document.getElementById('viz-box').offsetWidth;
+
+    // set get parameter in data_table url
+    $('#navitem-data-table').attr('href', 'data_table?width='+viz_box_width);
 </script>
+
 </body>
 </html>
 

@@ -45,7 +45,9 @@ $('#genes-box>select').attr('size', size);
 $(window).resize(function () {
 
     $('#genes-box>select').attr('size', size);
-    console.log(table_height);
+    // console.log(table_height);
 });
 
 $('#ctrl-panel-tbl').height = $('#genes-box').height;
+
+

@@ -10,8 +10,7 @@
     <div class="tabcontent" id="control_panel">
         {#                    {% block form %}#}
         <div>
-            <form action="{{ action }}"
-                  id="ctrl-panel-form"
+            <form id="ctrl-panel-form"
                   name="control_panel"
                   method="post"
                   class="form-check-inline">
@@ -92,7 +91,13 @@
                         <td>
                             <div>
                                 <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
-                                       form="ctrl-panel-form">
+                                       form="ctrl-panel-form" formaction="{{ action }}">
+                                <input type="submit" value="Download as csv" class="btn btn-lg" id="submit-btn"
+                                       form="ctrl-panel-form" formaction="download">
+{#    #}
+{##}
+{#                                <input id="" type="button" method="POST" value="Download as csv" name="download_button">#}
+
                             </div>
                         </td>
                     </tr>

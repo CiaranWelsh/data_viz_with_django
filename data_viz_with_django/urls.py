@@ -14,14 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from viz import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', views.get_name, {}, name='index'),
-    # path('', views.base_view, {}, name='base'),
     path('', views.plot_view, {}, name='index'),
-    path('data_table.html', views.data_table_view, {}, name='data_table'),
-    path('pca.html', views.pca_view, {}, name='pca')
+    path(r'data_table', views.data_table_view, {}, name='data_table_with_width'),
+    # path('data_table', views.data_table_view, {}, name='data_table'),
+    path('pca', views.pca_view, {}, name='pca'),
+    path('download', views.download_button_view, {}, name='download')
 ]
