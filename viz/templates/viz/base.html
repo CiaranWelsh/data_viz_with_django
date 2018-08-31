@@ -53,7 +53,7 @@
 
         {#        Content, middle of page, wide col#}
         <div class="container-fluid col-10">
-            <h1>Title Here</h1>
+            <h1>{% block title %}{% endblock title %}</h1>
 
             <div class="" id="viz-box">
                 {% block viz_box_content %}

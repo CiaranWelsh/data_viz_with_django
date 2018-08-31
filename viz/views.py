@@ -340,11 +340,6 @@ def pca_view(request):
         replicates = request.POST.getlist('replicates')
         colour_by = request.POST.getlist('colour_by')
 
-        # print(cell_lines)
-        # print(treatments)
-        # print(time_points)
-        # print(replicates)
-
         pca_data = PcaDct.objects.filter(
             cell_id__in=cell_lines
         ).filter(
@@ -357,22 +352,27 @@ def pca_view(request):
 
         explained_var = PcaDctExplainedVar.objects.all()
         explained_var = read_frame(explained_var, index_col='index')
-        print(explained_var)
 
+        ## patch for bug fix. Make colour_by variables match
+        ## the corresponding variables on tha back end for querying
+        ## pca_data
         pca_data = read_frame(pca_data, index_col='index')
         for i in range(len(colour_by)):
-            # print('col by', colour_by[i])
+            print('col by', colour_by[i])
             if colour_by[i] == 'time_points':
                 colour_by[i] = 'time_point'
 
             elif colour_by[i] == 'replicates':
                 colour_by[i] = 'replicate'
 
-            elif colour_by[i] == 'treatmments':
+            elif colour_by[i] == 'treatments':
                 colour_by[i] = 'treatment'
 
-            elif colour_by[i] == 'cell_line':
+            elif colour_by[i] == 'cell_lines':
                 colour_by[i] = 'cell_id'
+
+            else:
+                raise NotImplemented
 
         # print(pca_data.head())
         # print(colour_by)
@@ -387,6 +387,7 @@ def pca_view(request):
         def color_gen():
             for i in c:
                 yield i
+
         col = color_gen()
         for label, df in pca_data.groupby(by=colour_by):
             trace = go.Scatter3d(
@@ -428,11 +429,23 @@ def pca_view(request):
             config={'displayModeBar': False}
         )
 
+        ## patch for bug fix. Swap cell_id for cell_lines
+        ## for form on front end
+        for i in range(len(colour_by)):
+            if colour_by[i] == 'cell_id':
+                colour_by[i] = 'cell_lines'
+
+
+        initial = {
+            'cell_lines': cell_lines,
+            'treatments': treatments,
+            'time_points': time_points,
+            'replicates': replicates,
+            'colour_by': colour_by
+        }
+        print(colour_by)
         context = {
-            'pca_form': PCAForm(),
-            'pc1': pca_data['pc1'].to_json(),
-            'pc2': pca_data['pc2'].to_json(),
-            'pc3': pca_data['pc3'].to_json(),
+            'pca_form': PCAForm(initial=initial),
             'data': p,
         }
         return render(request, 'viz/pca.html', context=context)

@@ -18,9 +18,14 @@
     <link rel="stylesheet" href="{% static 'viz/pca_style.css' %}" type="text/css">
 {% endblock extra_stylesheets %}
 
+
 {% block navitem_line_plots %}{% endblock navitem_line_plots %}
 {% block navitem_data_table %}{% endblock navitem_data_table %}
 {% block navitem_pca %}active{% endblock navitem_pca %}
+
+{% block title %}
+    Interactive Principal component analysis
+{% endblock title %}
 
 
 {% block viz_box_content %}
@@ -31,7 +36,7 @@
     <div class="" id="control_panel">
         {#                    {% block form %}#}
         <div>
-            <form action="pca"
+            <form action=""
                   id="pca-form"
                   name="pca"
                   method="post"
@@ -124,7 +129,7 @@
                         <td>
                             <div>
                                 <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
-                                       form="pca-form">
+                                       form="pca-form" formaction="{% url 'pca' %}">
                                 {#                                <input type="submit" value="Download as csv" class="btn btn-lg" id="submit-btn"#}
                                 {#                                       form="ctrl-panel-form" formaction="download">#}
                             </div>
