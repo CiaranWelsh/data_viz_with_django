@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{# Load the tag library #}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>viz index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css" rel="stylesheet" type="text/css">
+
+    {#    <link rel="stylesheet" href="{% static 'viz/index_style.css' %}" type="text/css">#}
+    {% block extra_stylesheets %}
+    {% endblock extra_stylesheets %}
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.js"></script>
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{% static "viz/func.js" %}"></script>
+
+    {% block js_start %}
+
+    {% endblock %}
+
+</head>
+<body>
+
+<div class="container-fluid" id="container">
+
+    <div class="row" id="row1">
+        {#        Code for creating a navbar, left of page#}
+        <div class="container-fluid col-1 h-100">
+            <div class="row h-100 justify-content-center align-items-center">
+                <nav class="vertical-menu flex-column" style="position: fixed;">
+                    <a class="{% block navitem_line_plots %}{% endblock navitem_line_plots %}" href=".">Line Plots</a>
+                    <a id="navitem-data-table" class="{% block navitem_data_table %}{% endblock navitem_data_table %}"
+                       href="data_table">Data Table</a>
+                    <a class="{% block navitem_pca %}{% endblock navitem_pca %}" href="pca">PCA</a>
+                </nav>
+            </div>
+        </div>
+
+        {#        Content, middle of page, wide col#}
+        <div class="container-fluid col-10">
+            <h1>{% block title %}{% endblock title %}</h1>
+
+            <div class="" id="viz-box">
+                {% block viz_box_content %}
+                {% endblock %}
+            </div>
+
+            <div>
+                <div class="tab">
+                    <button class="tablinks"
+                            onClick="openTab(event, 'control_panel')"
+                            id="control_panel_tab">Control Panel
+                    </button>
+                    <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
+                </div>
+                {% block tab_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block js %}
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% endblock extra_scripts %}
+
+{#<script>#}
+{#    // get width of viz box#}
+{#    var viz_box_width = document.getElementById('viz-box').offsetWidth;#}
+{##}
+{#    // set get parameter in data_table url#}
+{#    $('#navitem-data-table').attr('href', 'data_table?width=' + viz_box_width);#}
+{#</script>#}
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

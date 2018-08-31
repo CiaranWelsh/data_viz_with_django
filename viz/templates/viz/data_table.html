@@ -1,33 +1,67 @@
-{% extends "viz/index.html" %}
+{#This file displays a box plot based on user options#}
+{% extends "viz/base.html" %}
 
-{% include "viz/index.html" %}
+{% load staticfiles %}
+{# Load the tag library #}
+{% load bootstrap4 %}
 
-{% block content %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
 
-    <h1>header</h1>
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+
+{% block extra_stylesheets %}
+    <link rel="stylesheet" href="{% static 'viz/index_style.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'viz/data_table_style.css' %}" type="text/css">
+{% endblock extra_stylesheets %}
+
+{% block js_start %}
+
 {% endblock %}
 
-{#{% block form %}#}
-{#    <form action="data_table.html" id="ctrl-panel-form" name="control_panel" method="post" class="form-check-inline">#}
-{#        <table border="2" class="table-dark center" id="ctrl-panel-tbl">#}
-{#            {% csrf_token %}#}
-{#            {{ db_controller_form }}#}
-{#        </table>#}
-{#    </form>#}
-{##}
-{#{% endblock %}#}
+{% block navitem_data_table %}active{% endblock navitem_data_table %}
+{% block navitem_line_plots %}{% endblock navitem_line_plots %}
+{% block navitem_pca %}{% endblock navitem_pca %}
+
+{% block viz_box_content %}
+    {{ div | safe }}
+    {#    <div id="download_button">#}
+
+    {#    </div>#}
+{% endblock %}
+
+
+{% block tab_content %}
+    {% include 'viz/options.html' %}
+{% endblock %}
+
+{#<h1>bth here</h1>#}
+{#{{ btn_div | safe }}#}
+
+{% block js %}
+    {{ script | safe }}
+    <script src="{% static 'viz/index.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'viz/data_table.js' %}" type="text/javascript"></script>
+    {#    {{ btn_script | safe }}#}
 
 
 
-{#<h1> suprise</h1>#}
+{% endblock %}
 
 
+<script>
+    // get width of viz box
+    var viz_box_width = document.getElementById('viz-box').offsetWidth;
 
-
-
-
-
-
+    // set get parameter in data_table url
+    $('#navitem-data-table').attr('href', 'data_table?width=' + viz_box_width);
+</script>
 
 
 

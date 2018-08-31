@@ -30,8 +30,11 @@ TREATMENTS = [(i, i) for i in TREATMENTS]
 CELL_LINES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 CELL_LINES = [(i, i) for i in CELL_LINES]
 
+REPLICATES = [(i, i) for i in [1, 2, 3, 4, 5, 6]]
+
 
 class DBControllerForm(forms.Form):
+
     checkbox_classes = 'form-check-input'
 
     genes = forms.MultipleChoiceField(
@@ -67,4 +70,46 @@ class DBControllerForm(forms.Form):
     time_points.widget.attrs.update({'class': checkbox_classes})
 
 
+class PCAForm(forms.Form):
+    checkbox_classes = 'form-check-input'
 
+    cell_lines = forms.MultipleChoiceField(
+        choices=CELL_LINES,
+        widget=forms.CheckboxSelectMultiple,
+        initial=list('ABDCEFGHI'),
+    )
+    cell_lines.widget.attrs.update({'class': checkbox_classes})
+
+    time_points = forms.MultipleChoiceField(
+        choices=TIMEPOINTS,
+        widget=forms.CheckboxSelectMultiple,
+        initial=[0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
+    )
+    time_points.widget.attrs.update({'class': checkbox_classes})
+
+
+    replicates = forms.MultipleChoiceField(
+        choices=REPLICATES,
+        widget=forms.CheckboxSelectMultiple,
+        initial=[1, 2, 3, 4, 5, 6]
+    )
+
+    treatments = forms.MultipleChoiceField(
+        choices=TREATMENTS + [('Baseline', 'Baseline')],
+        widget=forms.CheckboxSelectMultiple,
+        initial=['TGFb', 'Baseline', 'Control']
+    )
+    colour_by = forms.MultipleChoiceField(
+        choices=[
+            ('cell_lines', 'cell_lines'),
+            ('treatments', 'treatments'),
+            ('time_points', 'time_points'),
+            ('replicates', 'replicates'),
+        ],
+        widget=forms.CheckboxSelectMultiple,
+        initial=['cell_lines']
+    )
+
+
+class PCAExplainedVarForm(forms.Form):
+    pass

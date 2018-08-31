@@ -1,0 +1,124 @@
+{#<div class="tab">#}
+{#    <button class="tablinks"#}
+{#            onClick="openTab(event, 'control_panel')"#}
+{#            id="control_panel_tab">Control Panel#}
+{#    </button>#}
+{#    <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>#}
+{#</div>#}
+
+<div class="" id="outside-opt-container">
+    <div class="tabcontent" id="control_panel">
+        {#                    {% block form %}#}
+        <div>
+            <form id="ctrl-panel-form"
+                  name="control_panel"
+                  method="post"
+                  class="form-check-inline">
+                {% csrf_token %}
+
+                <table border="2" class="table-dark center" id="ctrl-panel-tbl">
+                    {% for field in db_controller_form.visible_fields %}
+                        <tr>
+                            <th>
+                                {% if field.label == 'Genes' %}
+                                    {#                                        do nothing#}
+                                {% else %}
+                                    {{ field.label_tag }}
+                                {% endif %}
+
+                            </th>
+                            <td>
+                                {% if field.label == 'Genes' %}
+                                    {#                                        do nothing#}
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+
+                                {% if field.label == 'Cell lines' %}
+
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">
+                                            Neonatal
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">
+                                            Senescent
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">
+                                            Adult
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+
+                                {% elif field.label == 'Treatments' %}
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_treatments', ['TGFb', 'Control'], true);">
+                                            Both
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_treatments', [], true);">
+                                            Neither
+                                        </button>
+                                    </div>
+
+                                {% elif field.label == 'Time points' %}
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_time_points', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <th></th>
+                        <td>
+                            <div id="button-box">
+                                <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
+                                       form="ctrl-panel-form" formaction="{{ action }}">
+                                <input type="submit" value="Download as csv" class="btn btn-lg" id="submit-btn"
+                                       form="ctrl-panel-form" formaction="download">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div id="genes-box" class="">
+                    {{ db_controller_form.genes }}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="tabcontent" id="legend">
+        <h2>legend</h2>
+        <div class="col-3"></div>
+        <div class="col-6">
+            <button>Top Left</button>
+            <button>Top Right</button>
+            <button>Bottom Left</button>
+            <button>Bottom Right</button>
+            <button>Off</button>
+        </div>
+
+        <div class="col-3">
+
+        </div>
+
+    </div>
+</div>
