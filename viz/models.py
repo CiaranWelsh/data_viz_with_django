@@ -81,7 +81,7 @@ class AuthUserUserPermissions(models.Model):
 
 
 class Dct(models.Model):
-    index = models.IntegerField(blank=True, primary_key=True)
+    index = models.IntegerField(blank=True, null=True)
     cell_line = models.TextField(blank=True, null=True)
     replicate = models.IntegerField(blank=True, null=True)
     gene = models.TextField(blank=True, null=True)
@@ -152,6 +152,35 @@ class Mean(models.Model):
     class Meta:
         managed = False
         db_table = 'mean'
+
+
+class PcaDct(models.Model):
+    index = models.IntegerField(blank=True, primary_key=True)
+    # sample = models.TextField(db_column='Sample', blank=True, null=True)  # Field name made lowercase.
+    cell_id = models.TextField(blank=True, null=True)
+    replicate = models.IntegerField(blank=True, null=True)
+    treatment = models.TextField(blank=True, null=True)
+    time_point = models.FloatField(blank=True, null=True)
+    # treatment_start_date = models.TextField(db_column='Treatment Start Date', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    # sub_experiment = models.IntegerField(blank=True, null=True)
+    filename = models.TextField(db_column='Filename', blank=True, null=True)  # Field name made lowercase.
+    cell_line = models.TextField(blank=True, null=True)
+    pc1 = models.FloatField(db_column='0', blank=True, null=True)  # Field renamed because it wasn't a valid Python identifier.
+    pc2 = models.FloatField(db_column='1', blank=True, null=True)  # Field renamed because it wasn't a valid Python identifier.
+    pc3 = models.FloatField(db_column='2', blank=True, null=True)  # Field renamed because it wasn't a valid Python identifier.
+
+    class Meta:
+        managed = False
+        db_table = 'pca_dct'
+
+
+class PcaDctExplainedVar(models.Model):
+    index = models.IntegerField(blank=True, primary_key=True)
+    number_0 = models.FloatField(db_column='0', blank=True, null=True)  # Field renamed because it wasn't a valid Python identifier.
+
+    class Meta:
+        managed = False
+        db_table = 'pca_dct_explained_var'
 
 
 class Sem(models.Model):

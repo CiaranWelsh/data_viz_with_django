@@ -1,4 +1,4 @@
-{#This file displays a box plot based on user options#}
+{#This file displays a pca data#}
 {% extends "viz/base.html" %}
 
 {% load staticfiles %}
@@ -12,9 +12,155 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 
-{% block navitem_pca %} active {% endblock %}
 
-{# main content #}
-{#{% block viz_box_content %}#}
-{#    {{ div | safe }}#}
-{#{% endblock %}#}
+{% block extra_stylesheets %}
+    <link rel="stylesheet" href="{% static 'viz/index_style.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'viz/pca_style.css' %}" type="text/css">
+{% endblock extra_stylesheets %}
+
+{% block navitem_line_plots %}{% endblock navitem_line_plots %}
+{% block navitem_data_table %}{% endblock navitem_data_table %}
+{% block navitem_pca %}active{% endblock navitem_pca %}
+
+
+{% block viz_box_content %}
+    {{ data | safe }}
+{% endblock %}
+
+{% block tab_content %}
+    <div class="" id="control_panel">
+        {#                    {% block form %}#}
+        <div>
+            <form action="pca"
+                  id="pca-form"
+                  name="pca"
+                  method="post"
+                  class="form-check-inline">
+                {% csrf_token %}
+
+                <table border="2" class="table-dark center" id="ctrl-panel-tbl">
+                    {% for field in pca_form.visible_fields %}
+                        <tr>
+                            <th>
+                                {% if field.label == 'Genes' %}
+                                    {#                                        do nothing#}
+                                {% else %}
+                                    {{ field.label_tag }}
+                                {% endif %}
+
+                            </th>
+                            <td>
+                                {% if field.label == 'Genes' %}
+                                    {#                                        do nothing#}
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+
+                                {% if field.label == 'Cell lines' %}
+
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['A', 'B', 'C'], true);">
+                                            Neonatal
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['D', 'E', 'F'], true);">
+                                            Senescent
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['G', 'H', 'I'], true);">
+                                            Adult
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_cell_lines', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+
+                                {% elif field.label == 'Treatments' %}
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_treatments', ['TGFb', 'Control', 'Baseline'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_treatments', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+
+                                {% elif field.label == 'Time points' %}
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_time_points', ['0','0.5','1','2','4','8','12','24','48','72','96'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_time_points', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+                                {% elif field.label == 'Replicates' %}
+                                    <div class="btn-group-lg">
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_replicates', ['1', '2', '3', '4', '5', '6'], true);">
+                                            All
+                                        </button>
+                                        <button type="button" class="btn btn-lg"
+                                                onclick="ticker('id_replicates', [], true);">
+                                            None
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <th></th>
+                        <td>
+                            <div>
+                                <input type="submit" value="Submit" class="btn btn-lg" id="submit-btn"
+                                       form="pca-form">
+                                {#                                <input type="submit" value="Download as csv" class="btn btn-lg" id="submit-btn"#}
+                                {#                                       form="ctrl-panel-form" formaction="download">#}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+
+        {#        <div>#}
+        {#            <form id="'colour-by-form"#}
+        {#        </div>#}
+    </div>
+
+
+{% endblock %}
+
+
+
+{% block js %}
+{% endblock %}
+
+{% block extra_scripts %}
+
+{% endblock extra_scripts %}
+
+
+
+
+
+
+
+
+
+
+
+
+

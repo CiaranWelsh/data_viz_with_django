@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.forms import ModelForm
-import pandas
+import pandas, numpy, os
+from functools import reduce
 
-from .models import Dct, Mean, Sem, Std
-from .forms import DBControllerForm
+from .models import Dct, Mean, Sem, Std, PcaDct, PcaDctExplainedVar
+from .forms import DBControllerForm, PCAForm
 from django_pandas.io import read_frame
 
 from bokeh.plotting import figure
@@ -14,6 +15,12 @@ from bokeh.models.widgets import DataTable, TableColumn, NumberFormatter, Button
 from bokeh.embed import components
 import bokeh.palettes as palettes
 from itertools import cycle
+
+import plotly.plotly as py
+import plotly.offline as pyo
+import plotly.graph_objs as go
+
+import plotly.tools as plotly_tools
 
 
 def base_view(request):
@@ -226,6 +233,7 @@ def plot_view(request):
             'action': '.',
         })
 
+
 def process_form(data):
     means = pandas.DataFrame(data['means'].stack(), columns=['Mean'])
     sems = pandas.DataFrame(data['sems'].stack(), columns=['SEM'])
@@ -242,8 +250,8 @@ def process_form(data):
     df['cell_group'] = cell_line_type_vec
     return df
 
-def data_table_view(request):
 
+def data_table_view(request):
     if request.method == 'POST':
 
         form_data = form_handler(request)
@@ -255,10 +263,10 @@ def data_table_view(request):
         # print('new_width = ', width)
         columns = [
             TableColumn(field='cell_group', title='Cell Group', width=width),
-            TableColumn(field='cell_line', title='Cell Line', width=int(width*0.5)),
-            TableColumn(field='treatment', title='Treatment', width=int(width*0.7)),
+            TableColumn(field='cell_line', title='Cell Line', width=int(width * 0.5)),
+            TableColumn(field='treatment', title='Treatment', width=int(width * 0.7)),
             TableColumn(field='gene', title='Gene', width=width),
-            TableColumn(field='time', title='Time', width=int(width*0.5)),
+            TableColumn(field='time', title='Time', width=int(width * 0.5)),
             TableColumn(field='Mean', title='Mean', width=width, formatter=NumberFormatter(format='0.0000')),
             TableColumn(field='SEM', title='SEM', width=width, formatter=NumberFormatter(format='0.0000'))
         ]
@@ -322,15 +330,115 @@ def download_button_view(request):
     df.to_csv(path_or_buf=response, sep=',', index=False)
     return response
 
+
 def pca_view(request):
     if request.method == 'POST':
-        return HttpResponse('pca')
+        cell_lines = request.POST.getlist('cell_lines')
+        # genes = request.POST.getlist('genes')
+        treatments = request.POST.getlist('treatments')
+        time_points = request.POST.getlist('time_points')
+        replicates = request.POST.getlist('replicates')
+        colour_by = request.POST.getlist('colour_by')
+
+        # print(cell_lines)
+        # print(treatments)
+        # print(time_points)
+        # print(replicates)
+
+        pca_data = PcaDct.objects.filter(
+            cell_id__in=cell_lines
+        ).filter(
+            replicate__in=replicates
+        ).filter(
+            treatment__in=treatments
+        ).filter(
+            time_point__in=time_points
+        )
+
+        explained_var = PcaDctExplainedVar.objects.all()
+        explained_var = read_frame(explained_var, index_col='index')
+        print(explained_var)
+
+        pca_data = read_frame(pca_data, index_col='index')
+        for i in range(len(colour_by)):
+            # print('col by', colour_by[i])
+            if colour_by[i] == 'time_points':
+                colour_by[i] = 'time_point'
+
+            elif colour_by[i] == 'replicates':
+                colour_by[i] = 'replicate'
+
+            elif colour_by[i] == 'treatmments':
+                colour_by[i] = 'treatment'
+
+            elif colour_by[i] == 'cell_line':
+                colour_by[i] = 'cell_id'
+
+        # print(pca_data.head())
+        # print(colour_by)
+        traces = []
+
+        num_colours_needed = 0
+        for label, df in pca_data.groupby(by=colour_by):
+            num_colours_needed += 1
+
+        c = ['hsl(' + str(h) + ',50%' + ',50%)' for h in numpy.linspace(0, 350, num_colours_needed)]
+
+        def color_gen():
+            for i in c:
+                yield i
+        col = color_gen()
+        for label, df in pca_data.groupby(by=colour_by):
+            trace = go.Scatter3d(
+                x=numpy.array(df['pc1']),
+                y=numpy.array(df['pc2']),
+                z=numpy.array(df['pc3']),
+                mode='markers',
+                marker={
+                    'color': col.__next__(),
+                    'opacity': 0.75
+                },
+                name=label if isinstance(label, (str, int, float)) else reduce(lambda x, y: "{}_{}".format(x, y), label)
+            )
+            traces.append(trace)
+
+        layout = go.Layout(
+            margin=dict(l=0, r=0, b=0, t=0),
+            height=600,
+            xaxis={
+                'title': 'PC1 ({}% variance explained)'.format(explained_var.iloc[0]),
+            },
+            yaxis={'title': 'PC2 ({}% variance explained'.format(explained_var.iloc[1])},
+            legend={
+                'font': {
+                    'size': 20
+                }
+
+            }
+            # zaxis={'title': 'PC3 ({}% variance explained'.format(explained_var.iloc[2])}
+        )
+        fig = go.Figure(data=traces, layout=layout)
+
+        p = pyo.plot(
+            figure_or_data=fig,
+            # layout=layout,
+            output_type='div',
+            # filename=filename,
+            auto_open=False,
+            config={'displayModeBar': False}
+        )
+
+        context = {
+            'pca_form': PCAForm(),
+            'pc1': pca_data['pc1'].to_json(),
+            'pc2': pca_data['pc2'].to_json(),
+            'pc3': pca_data['pc3'].to_json(),
+            'data': p,
+        }
+        return render(request, 'viz/pca.html', context=context)
 
     else:
-        print('get request from plot_view (index)')
-        db_controller_form = DBControllerForm()
 
         return render(request, 'viz/pca.html', {
-            'db_controller_form': db_controller_form,
-            'action': 'viz/index.html',
+            'pca_form': PCAForm(),
         })

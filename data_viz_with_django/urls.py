@@ -25,3 +25,4 @@ urlpatterns = [
     path('pca', views.pca_view, {}, name='pca'),
     path('download', views.download_button_view, {}, name='download')
 ]
+

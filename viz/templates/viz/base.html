@@ -26,8 +26,8 @@
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js"></script>
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.js"></script>
     <script src="http://cdn.pydata.org/bokeh/release/bokeh-api-0.13.0.min.js"></script>
-
-
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{% static "viz/func.js" %}"></script>
 
     {% block js_start %}
 
@@ -61,6 +61,13 @@
             </div>
 
             <div>
+                <div class="tab">
+                    <button class="tablinks"
+                            onClick="openTab(event, 'control_panel')"
+                            id="control_panel_tab">Control Panel
+                    </button>
+                    <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
+                </div>
                 {% block tab_content %}
                 {% endblock %}
             </div>
@@ -75,13 +82,13 @@
 
 {% endblock extra_scripts %}
 
-<script>
-    // get width of viz box
-    var viz_box_width = document.getElementById('viz-box').offsetWidth;
-
-    // set get parameter in data_table url
-    $('#navitem-data-table').attr('href', 'data_table?width='+viz_box_width);
-</script>
+{#<script>#}
+{#    // get width of viz box#}
+{#    var viz_box_width = document.getElementById('viz-box').offsetWidth;#}
+{##}
+{#    // set get parameter in data_table url#}
+{#    $('#navitem-data-table').attr('href', 'data_table?width=' + viz_box_width);#}
+{#</script>#}
 
 </body>
 </html>

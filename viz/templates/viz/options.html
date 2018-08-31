@@ -1,10 +1,10 @@
-<div class="tab">
-    <button class="tablinks"
-            onClick="openTab(event, 'control_panel')"
-            id="control_panel_tab">Control Panel
-    </button>
-    <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>
-</div>
+{#<div class="tab">#}
+{#    <button class="tablinks"#}
+{#            onClick="openTab(event, 'control_panel')"#}
+{#            id="control_panel_tab">Control Panel#}
+{#    </button>#}
+{#    <button class="tablinks" onClick="openTab(event, 'legend')">Legend</button>#}
+{#</div>#}
 
 <div class="" id="outside-opt-container">
     <div class="tabcontent" id="control_panel">
@@ -94,10 +94,6 @@
                                        form="ctrl-panel-form" formaction="{{ action }}">
                                 <input type="submit" value="Download as csv" class="btn btn-lg" id="submit-btn"
                                        form="ctrl-panel-form" formaction="download">
-{#    #}
-{##}
-{#                                <input id="" type="button" method="POST" value="Download as csv" name="download_button">#}
-
                             </div>
                         </td>
                     </tr>
@@ -105,7 +101,6 @@
                 <div id="genes-box" class="">
                     {{ db_controller_form.genes }}
                 </div>
-
             </form>
         </div>
     </div>
