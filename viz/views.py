@@ -426,7 +426,7 @@ def pca_view(request):
             output_type='div',
             # filename=filename,
             auto_open=False,
-            config={'displayModeBar': False}
+            config={'displayModeBar': True}
         )
 
         ## patch for bug fix. Swap cell_id for cell_lines
