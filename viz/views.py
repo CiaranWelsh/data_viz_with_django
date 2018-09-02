@@ -413,8 +413,8 @@ def pca_view(request):
             legend={
                 'font': {
                     'size': 20
-                }
-
+                },
+                'y': 0.95  # Lower legend a little to keep away from modebar
             }
             # zaxis={'title': 'PC3 ({}% variance explained'.format(explained_var.iloc[2])}
         )
