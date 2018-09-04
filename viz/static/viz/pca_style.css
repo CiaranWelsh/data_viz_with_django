@@ -1,8 +1,8 @@
-/*.modebar {*/
-/*display: none !important;*/
-/*}*/
-
-/*.modebar-group {*/
-    /*height: 50px;*/
-    /*width: 50px;*/
-/*}*/
+/*
+Unset outer SVG width/height specification so Plotly.js modebar icons
+aren't distorted
+*/
+svg {
+    width: unset;
+    height: unset;
+}
