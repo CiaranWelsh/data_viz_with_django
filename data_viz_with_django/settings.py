@@ -26,7 +26,8 @@ SECRET_KEY = '+$j3=hg+&g5e8#xjqcldw+ejrw227egia*9^yigj6ly_4td8v*'
 DEBUG = True
 
 ALLOWED_HOSTS = ['cwelsh2.pythonanywhere.com',
-                 '127.0.0.1:8000']
+                 '127.0.0.1:8000',
+                 '127.0.0.1']
 
 
 # Application definition
