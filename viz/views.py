@@ -33,24 +33,16 @@ def base_view(request):
 
 
 def form_handler(request):
-    cell_lines = request.POST.getlist('cell_lines')
-    genes = request.POST.getlist('genes')
-    treatments = request.POST.getlist('treatments')
-    time_points = request.POST.getlist('time_points')
-
-    # print('genes', genes)
-    # print('cell_linres', cell_lines)
-    # print('treatments', treatments)
-    # print('time', time_points)
-
-    # for i in [cell_lines, genes, treatments, time_points]:
-    #     print(i, i==[])
-    #     if i == []:
-    #         db_controller_form = DBControllerForm()
-    #
-    #         return render(request, 'viz/base.html', {
-    #             'db_controller_form': db_controller_form
-    #         })
+    if request.method == 'POST':
+        cell_lines = request.POST.getlist('cell_lines')
+        genes = request.POST.getlist('genes')
+        treatments = request.POST.getlist('treatments')
+        time_points = request.POST.getlist('time_points')
+    else:
+        cell_lines = ['A', 'D', 'F']
+        genes = ['ACTA2']
+        treatments = ['TGFb']
+        time_points = [0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
 
     means = Mean.objects.filter(
         cell_line__in=cell_lines
@@ -86,6 +78,8 @@ def form_handler(request):
     sems = read_frame(sems, index_col='index')
     stds = read_frame(stds, index_col='index')
 
+    print('means', means)
+
     means = means.pivot_table(
         values='value',
         index=['cell_line', 'treatment', 'gene'],
@@ -110,6 +104,99 @@ def form_handler(request):
             'time_points': time_points}
 
 
+def do_plot(request, form_data=None):
+    if form_data is None:
+        form_data = form_handler(request=request)
+
+    assert form_data is not None
+
+    TOOLS = "pan,wheel_zoom,box_zoom,reset,save,box_select"
+
+    plot = figure(
+        sizing_mode='stretch_both',
+        x_axis_label='Time (h)',
+        y_axis_label='Normalised Cycle Threshold',
+        tools=TOOLS,
+        toolbar_location='above'
+    )
+    plot.xaxis.axis_label_text_font_size = '20pt'
+    plot.yaxis.axis_label_text_font_size = '20pt'
+
+    plot.xaxis.major_label_text_font_size = '18pt'
+    plot.yaxis.major_label_text_font_size = '18pt'
+
+    plot.xgrid.visible = False
+    plot.ygrid.visible = False
+
+    num_colours_needed = 0
+    for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
+        for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
+            for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
+                num_colours_needed += 1
+
+    if num_colours_needed <= 2:
+        colours = palettes.Plasma[3]
+    else:
+        colours = palettes.Plasma[num_colours_needed]
+
+    def colour_gen():
+        for c in cycle(colours):
+            yield c
+
+    cols = colour_gen()
+    for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
+        for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
+            for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
+
+                col = cols.__next__()
+                plot_data = form_data['means'].loc[cl, tr, g]
+                err_data = form_data['sems'].loc[cl, tr, g]
+
+                legend_label = '{}_{}_{}'.format(g, cl, tr),
+
+                err_xs = []
+                err_ys = []
+
+                for x, y, err in zip(list(plot_data.index), plot_data.values, err_data.values):
+                    err_xs.append((x, x))
+                    err_ys.append((y - err, y + err))
+
+                lin = plot.line(
+                    list(plot_data.index),
+                    plot_data.values,
+                    color=col,
+                    line_width=5,
+                    legend=legend_label[0],
+                    alpha=0.75
+                )
+
+                circ = plot.circle(
+                    list(plot_data.index),
+                    plot_data.values,
+                    color=col,
+                    size=15,
+                    legend=legend_label[0],
+                    alpha=0.5
+                )
+
+                ##plot errors
+                errs = plot.multi_line(
+                    err_xs, err_ys,
+                    line_width=4,
+                    color=col,
+                    alpha=0.5,
+                    legend=legend_label[0]
+                )
+
+    plot.legend.label_text_font_size = '20pt'
+    plot.legend.location = 'top_left'
+    plot.legend.click_policy = 'hide'
+
+    script, div = components(plot)
+
+    return script, div
+
+
 def plot_view(request):
     """
     Django view to plot line graph based on post request parameters
@@ -118,94 +205,9 @@ def plot_view(request):
     """
     print('request type: ', request.method)
     if request.method == 'POST':
-
-        print('post request from plot_view (index)')
-
         form_data = form_handler(request)
-
-        TOOLS = "pan,wheel_zoom,box_zoom,reset,save,box_select"
-
-        plot = figure(
-            sizing_mode='stretch_both',
-            x_axis_label='Time (h)',
-            y_axis_label='Normalised Cycle Threshold',
-            tools=TOOLS,
-            toolbar_location='above'
-        )
-        plot.xaxis.axis_label_text_font_size = '20pt'
-        plot.yaxis.axis_label_text_font_size = '20pt'
-
-        plot.xaxis.major_label_text_font_size = '18pt'
-        plot.yaxis.major_label_text_font_size = '18pt'
-
-        plot.xgrid.visible = False
-        plot.ygrid.visible = False
-
-        num_colours_needed = 0
-        for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
-            for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
-                for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
-                    num_colours_needed += 1
-
-        if num_colours_needed <= 2:
-            colours = palettes.Plasma[3]
-        else:
-            colours = palettes.Plasma[num_colours_needed]
-
-        def colour_gen():
-            for c in cycle(colours):
-                yield c
-
-        cols = colour_gen()
-        for cl in sorted(list(set(form_data['means'].index.get_level_values(0)))):
-            for tr in sorted(list(set(form_data['means'].index.get_level_values(1)))):
-                for g in sorted(list(set(form_data['means'].index.get_level_values(2)))):
-
-                    col = cols.__next__()
-                    plot_data = form_data['means'].loc[cl, tr, g]
-                    err_data = form_data['sems'].loc[cl, tr, g]
-
-                    legend_label = '{}_{}_{}'.format(g, cl, tr),
-
-                    err_xs = []
-                    err_ys = []
-
-                    for x, y, err in zip(list(plot_data.index), plot_data.values, err_data.values):
-                        err_xs.append((x, x))
-                        err_ys.append((y - err, y + err))
-
-                    lin = plot.line(
-                        list(plot_data.index),
-                        plot_data.values,
-                        color=col,
-                        line_width=5,
-                        legend=legend_label[0],
-                        alpha=0.75
-                    )
-
-                    circ = plot.circle(
-                        list(plot_data.index),
-                        plot_data.values,
-                        color=col,
-                        size=15,
-                        legend=legend_label[0],
-                        alpha=0.5
-                    )
-
-                    ##plot errors
-                    errs = plot.multi_line(
-                        err_xs, err_ys,
-                        line_width=4,
-                        color=col,
-                        alpha=0.5,
-                        legend=legend_label[0]
-                    )
-
-        plot.legend.label_text_font_size = '20pt'
-        plot.legend.location = 'top_left'
-        plot.legend.click_policy = 'hide'
-
-        script, div = components(plot)
+        script, div = do_plot(request=request, form_data=form_data)
+        print('post request from plot_view (index)')
 
         context = {
             'means': form_data['means'],
@@ -227,10 +229,13 @@ def plot_view(request):
     else:
         print('get request from plot_view (index)')
         db_controller_form = DBControllerForm()
+        script, div = do_plot(request=request)
 
         return render(request, 'viz/index.html', {
             'db_controller_form': db_controller_form,
             'action': '.',
+            'div': div,
+            'script': script
         })
 
 
@@ -340,118 +345,146 @@ def pca_view(request):
         replicates = request.POST.getlist('replicates')
         colour_by = request.POST.getlist('colour_by')
 
-        pca_data = PcaDct.objects.filter(
-            cell_id__in=cell_lines
-        ).filter(
-            replicate__in=replicates
-        ).filter(
-            treatment__in=treatments
-        ).filter(
-            time_point__in=time_points
-        )
-
-        explained_var = PcaDctExplainedVar.objects.all()
-        explained_var = read_frame(explained_var, index_col='index')
-
-        ## patch for bug fix. Make colour_by variables match
-        ## the corresponding variables on tha back end for querying
-        ## pca_data
-        pca_data = read_frame(pca_data, index_col='index')
-        for i in range(len(colour_by)):
-            print('col by', colour_by[i])
-            if colour_by[i] == 'time_points':
-                colour_by[i] = 'time_point'
-
-            elif colour_by[i] == 'replicates':
-                colour_by[i] = 'replicate'
-
-            elif colour_by[i] == 'treatments':
-                colour_by[i] = 'treatment'
-
-            elif colour_by[i] == 'cell_lines':
-                colour_by[i] = 'cell_id'
-
-            else:
-                raise NotImplemented
-
-        # print(pca_data.head())
-        # print(colour_by)
-        traces = []
-
-        num_colours_needed = 0
-        for label, df in pca_data.groupby(by=colour_by):
-            num_colours_needed += 1
-
-        c = ['hsl(' + str(h) + ',50%' + ',50%)' for h in numpy.linspace(0, 350, num_colours_needed)]
-
-        def color_gen():
-            for i in c:
-                yield i
-
-        col = color_gen()
-        for label, df in pca_data.groupby(by=colour_by):
-            trace = go.Scatter3d(
-                x=numpy.array(df['pc1']),
-                y=numpy.array(df['pc2']),
-                z=numpy.array(df['pc3']),
-                mode='markers',
-                marker={
-                    'color': col.__next__(),
-                    'opacity': 0.75
-                },
-                name=label if isinstance(label, (str, int, float)) else reduce(lambda x, y: "{}_{}".format(x, y), label)
-            )
-            traces.append(trace)
-
-        layout = go.Layout(
-            margin=dict(l=0, r=0, b=0, t=0),
-            height=600,
-            xaxis={
-                'title': 'PC1 ({}% variance explained)'.format(explained_var.iloc[0]),
-            },
-            yaxis={'title': 'PC2 ({}% variance explained'.format(explained_var.iloc[1])},
-            legend={
-                'font': {
-                    'size': 20
-                }
-
-            }
-            # zaxis={'title': 'PC3 ({}% variance explained'.format(explained_var.iloc[2])}
-        )
-        fig = go.Figure(data=traces, layout=layout)
-
-        p = pyo.plot(
-            figure_or_data=fig,
-            # layout=layout,
-            output_type='div',
-            # filename=filename,
-            auto_open=False,
-            config={'displayModeBar': False}
-        )
-
-        ## patch for bug fix. Swap cell_id for cell_lines
-        ## for form on front end
-        for i in range(len(colour_by)):
-            if colour_by[i] == 'cell_id':
-                colour_by[i] = 'cell_lines'
-
-
-        initial = {
-            'cell_lines': cell_lines,
-            'treatments': treatments,
-            'time_points': time_points,
-            'replicates': replicates,
-            'colour_by': colour_by
-        }
-        print(colour_by)
-        context = {
-            'pca_form': PCAForm(initial=initial),
-            'data': p,
-        }
-        return render(request, 'viz/pca.html', context=context)
-
     else:
+        cell_lines = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        treatments = ['TGFb', 'Control', 'Baseline']
+        time_points = [0, 0.5, 1, 2, 4, 8, 12, 24, 48, 72, 96]
+        replicates = [1, 2, 3, 4, 5, 6]
+        colour_by = ['cell_lines']
 
-        return render(request, 'viz/pca.html', {
-            'pca_form': PCAForm(),
-        })
+    # if request.method == 'POST':
+    pca_data = PcaDct.objects.filter(
+        cell_id__in=cell_lines
+    ).filter(
+        replicate__in=replicates
+    ).filter(
+        treatment__in=treatments
+    ).filter(
+        time_point__in=time_points
+    )
+
+    explained_var = PcaDctExplainedVar.objects.all()
+    explained_var = read_frame(explained_var, index_col='index')
+
+    ## patch for bug fix. Make colour_by variables match
+    ## the corresponding variables on tha back end for querying
+    ## pca_data
+    pca_data = read_frame(pca_data, index_col='index')
+    for i in range(len(colour_by)):
+        print('col by', colour_by[i])
+        if colour_by[i] == 'time_points':
+            colour_by[i] = 'time_point'
+
+        elif colour_by[i] == 'replicates':
+            colour_by[i] = 'replicate'
+
+        elif colour_by[i] == 'treatments':
+            colour_by[i] = 'treatment'
+
+        elif colour_by[i] == 'cell_lines':
+            colour_by[i] = 'cell_id'
+
+        else:
+            raise NotImplemented
+
+    traces = []
+
+    num_colours_needed = 0
+    for label, df in pca_data.groupby(by=colour_by):
+        num_colours_needed += 1
+
+    c = ['hsl(' + str(h) + ',50%' + ',50%)' for h in numpy.linspace(0, 350, num_colours_needed)]
+
+    def color_gen():
+        for i in c:
+            yield i
+
+    col = color_gen()
+    for label, df in pca_data.groupby(by=colour_by):
+        trace = go.Scatter3d(
+            x=numpy.array(df['pc1']),
+            y=numpy.array(df['pc2']),
+            z=numpy.array(df['pc3']),
+            mode='markers',
+            marker={
+                'color': col.__next__(),
+                'opacity': 0.75
+            },
+            name=label if isinstance(label, (str, int, float)) else reduce(lambda x, y: "{}_{}".format(x, y), label)
+        )
+        traces.append(trace)
+
+    layout = go.Layout(
+        margin=dict(l=0, r=0, b=0, t=0),
+        height=600,
+        scene={
+            'camera': {
+                'up': {
+                    'x': 0,
+                    'y': 0,
+                    'z': 1
+                },
+                'center': {
+                    'x': 0,
+                    'y': 0,
+                    'z': 0
+                },
+                'eye': {
+                    'x': 1.25,
+                    'y': 1.25,
+                    'z': 1.25
+                }
+            },
+            'xaxis': {'title': 'PC1 ({}% variance explained)'.format(
+                round(float(explained_var.iloc[0])*100), 2)},
+            'yaxis': {'title': 'PC2 ({}% variance explained)'.format(
+                round(float(explained_var.iloc[1])*100), 2)},
+            'zaxis': {'title': 'PC3 ({}% variance explained)'.format(
+                round(float(explained_var.iloc[2])*100), 2)},
+        },
+
+
+        legend={
+            'font': {
+                'size': 20
+            }
+
+        }
+        # zaxis={'title': 'PC3 ({}% variance explained'.format(explained_var.iloc[2])}
+    )
+    fig = go.Figure(data=traces, layout=layout)
+
+    p = pyo.plot(
+        figure_or_data=fig,
+        # layout=layout,
+        output_type='div',
+        # filename=filename,
+        auto_open=False,
+        config={'displayModeBar': False}
+    )
+
+    ## patch for bug fix. Swap cell_id for cell_lines
+    ## for form on front end
+    for i in range(len(colour_by)):
+        if colour_by[i] == 'cell_id':
+            colour_by[i] = 'cell_lines'
+
+    initial = {
+        'cell_lines': cell_lines,
+        'treatments': treatments,
+        'time_points': time_points,
+        'replicates': replicates,
+        'colour_by': colour_by
+    }
+    print(colour_by)
+    context = {
+        'pca_form': PCAForm(initial=initial),
+        'data': p,
+    }
+    return render(request, 'viz/pca.html', context=context)
+
+    # else:
+    #
+    #     return render(request, 'viz/pca.html', {
+    #         'pca_form': PCAForm(),
+    #     })
