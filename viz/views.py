@@ -363,17 +363,84 @@ def pca_view(request):
         time_point__in=time_points
     )
 
-    explained_var = PcaDctExplainedVar.objects.all()
-    explained_var = read_frame(explained_var, index_col='index')
+        explained_var = PcaDctExplainedVar.objects.all()
+        explained_var = read_frame(explained_var, index_col='index')
 
-    ## patch for bug fix. Make colour_by variables match
-    ## the corresponding variables on tha back end for querying
-    ## pca_data
-    pca_data = read_frame(pca_data, index_col='index')
-    for i in range(len(colour_by)):
-        print('col by', colour_by[i])
-        if colour_by[i] == 'time_points':
-            colour_by[i] = 'time_point'
+        ## patch for bug fix. Make colour_by variables match
+        ## the corresponding variables on tha back end for querying
+        ## pca_data
+        pca_data = read_frame(pca_data, index_col='index')
+        for i in range(len(colour_by)):
+            print('col by', colour_by[i])
+            if colour_by[i] == 'time_points':
+                colour_by[i] = 'time_point'
+
+            elif colour_by[i] == 'replicates':
+                colour_by[i] = 'replicate'
+
+            elif colour_by[i] == 'treatments':
+                colour_by[i] = 'treatment'
+
+            elif colour_by[i] == 'cell_lines':
+                colour_by[i] = 'cell_id'
+
+            else:
+                raise NotImplemented
+
+        # print(pca_data.head())
+        # print(colour_by)
+        traces = []
+
+        num_colours_needed = 0
+        for label, df in pca_data.groupby(by=colour_by):
+            num_colours_needed += 1
+
+        c = ['hsl(' + str(h) + ',50%' + ',50%)' for h in numpy.linspace(0, 350, num_colours_needed)]
+
+        def color_gen():
+            for i in c:
+                yield i
+
+        col = color_gen()
+        for label, df in pca_data.groupby(by=colour_by):
+            trace = go.Scatter3d(
+                x=numpy.array(df['pc1']),
+                y=numpy.array(df['pc2']),
+                z=numpy.array(df['pc3']),
+                mode='markers',
+                marker={
+                    'color': col.__next__(),
+                    'opacity': 0.75
+                },
+                name=label if isinstance(label, (str, int, float)) else reduce(lambda x, y: "{}_{}".format(x, y), label)
+            )
+            traces.append(trace)
+
+        layout = go.Layout(
+            margin=dict(l=0, r=0, b=0, t=0),
+            height=600,
+            xaxis={
+                'title': 'PC1 ({}% variance explained)'.format(explained_var.iloc[0]),
+            },
+            yaxis={'title': 'PC2 ({}% variance explained'.format(explained_var.iloc[1])},
+            legend={
+                'font': {
+                    'size': 20
+                },
+                'y': 0.95  # Lower legend a little to keep away from modebar
+            }
+            # zaxis={'title': 'PC3 ({}% variance explained'.format(explained_var.iloc[2])}
+        )
+        fig = go.Figure(data=traces, layout=layout)
+
+        p = pyo.plot(
+            figure_or_data=fig,
+            # layout=layout,
+            output_type='div',
+            # filename=filename,
+            auto_open=False,
+            config={'displayModeBar': True}
+        )
 
         elif colour_by[i] == 'replicates':
             colour_by[i] = 'replicate'

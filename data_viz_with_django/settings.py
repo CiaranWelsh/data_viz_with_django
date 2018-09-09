@@ -25,7 +25,8 @@ SECRET_KEY = '+$j3=hg+&g5e8#xjqcldw+ejrw227egia*9^yigj6ly_4td8v*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['cwelsh2.pythonanywhere.com',
+                 '127.0.0.1:8000']
 
 
 # Application definition
@@ -33,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'viz',
     'bootstrap4',
-    'django_nvd3',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -126,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(VIZ_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(VIZ_DIR, 'static'),
 ]
