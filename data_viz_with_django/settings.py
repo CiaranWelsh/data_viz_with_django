@@ -23,7 +23,7 @@ VIZ_DIR = os.path.join(BASE_DIR, 'viz')
 SECRET_KEY = '+$j3=hg+&g5e8#xjqcldw+ejrw227egia*9^yigj6ly_4td8v*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['cwelsh2.pythonanywhere.com',
                  '127.0.0.1:8000',
