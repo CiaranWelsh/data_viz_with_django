@@ -13,7 +13,7 @@ ConfigArgParse==0.13.0
 coursera-dl==0.11.4
 cryptography==2.2.2
 decorator==4.3.0
-Django==2.1
+Django==2.1.11
 django-bootstrap4==0.0.6
 django-bower==5.2.0
 django-nvd3==0.9.7
