@@ -30,7 +30,7 @@ Jinja2==2.10
 jsonschema==2.6.0
 jupyter-core==4.4.0
 keyring==13.2.1
-lxml==4.2.4
+lxml==4.6.5
 MarkupSafe==1.0
 menuinst==1.4.14
 nbformat==4.4.0
