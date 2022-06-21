@@ -34,7 +34,7 @@ lxml==4.2.4
 MarkupSafe==1.0
 menuinst==1.4.14
 nbformat==4.4.0
-numpy==1.15.0
+numpy==1.22.0
 packaging==17.1
 pandas==0.23.4
 parso==0.3.1
